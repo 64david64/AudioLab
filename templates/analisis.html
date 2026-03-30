@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis | AudioLab{% endblock %}
+
+{% block content %}
+<div class="section-card">
+    <h2>Zona de análisis</h2>
+    <p>
+        En esta sección podrás cargar un archivo de audio local y preparar
+        su visualización en el dominio del tiempo y en el dominio de la frecuencia.
+    </p>
+</div>
+
+<div class="section-grid analysis-top-grid">
+    <div class="section-card upload-box">
+        <h3>Cargar archivo de audio</h3>
+        <p class="helper-text">
+            Formatos permitidos en esta etapa: .wav, .mp3 y .ogg
+        </p>
+
+        <input type="file" id="audio-file" accept=".wav,.mp3,.ogg">
+
+        <p id="file-status" class="status-text">
+            Aún no se ha cargado ningún archivo.
+        </p>
+
+        <button type="button" class="primary-btn" id="process-audio-btn">
+            Procesar audio
+        </button>
+    </div>
+
+    <div class="section-card metadata-box">
+        <h3>Información del archivo</h3>
+
+        <div class="metadata-list">
+            <div class="metadata-item">
+                <span class="metadata-label">Nombre:</span>
+                <span id="meta-name">—</span>
+            </div>
+
+            <div class="metadata-item">
+                <span class="metadata-label">Duración:</span>
+                <span id="meta-duration">—</span>
+            </div>
+
+            <div class="metadata-item">
+                <span class="metadata-label">Frecuencia de muestreo:</span>
+                <span id="meta-samplerate">—</span>
+            </div>
+
+            <div class="metadata-item">
+                <span class="metadata-label">Canales:</span>
+                <span id="meta-channels">—</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="plots-stack">
+    <div class="section-card plot-box">
+        <h3>Forma de onda</h3>
+        <p class="helper-text">
+            Aquí se mostrará la señal en el dominio del tiempo.
+        </p>
+
+        <div class="wave-controls">
+            <div class="control-group">
+                <label for="view-start">Inicio de vista (s)</label>
+                <input type="number" id="view-start" min="0" step="1" value="0">
+            </div>
+
+            <div class="control-group">
+                <label for="view-window">Duración visible (s)</label>
+                <input type="number" id="view-window" min="1" step="1" value="10">
+            </div>
+
+            <div class="control-group control-button-group">
+                <button type="button" class="primary-btn" id="update-view-btn">
+                    Actualizar vista
+                </button>
+            </div>
+        </div>
+
+        <canvas id="waveform-canvas" class="plot-canvas"></canvas>
+    </div>
+
+    <div class="section-card plot-box">
+        <h3>Transformada rápida de Fourier (FFT)</h3>
+        <p class="helper-text">
+            Aquí se mostrará la distribución del contenido en frecuencia.
+        </p>
+        <div class="plot-placeholder">
+            Aquí irá la gráfica de la FFT
+        </div>
+    </div>
+</div>
+{% endblock %}

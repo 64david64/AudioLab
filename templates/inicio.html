@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio | AudioLab{% endblock %}
+
+{% block content %}
+<div class="section-card hero">
+    <h2>Explora el sonido desde la física y la visualización</h2>
+    <p>
+        Este visor permite analizar un archivo de audio de forma visual,
+        observando cómo se comporta una señal sonora en el tiempo
+        y cómo se distribuye su contenido en frecuencia.
+    </p>
+    <p>
+        La idea no es solo mostrar gráficas, sino ayudarte a comprender
+        qué significan desde el procesamiento digital de señales,
+        la acústica y la física de ondas.
+    </p>
+    <a href="{{ url_for('analisis') }}" class="primary-btn-link">Comenzar análisis</a>
+</div>
+
+<div class="section-card">
+    <h3>¿Por qué mirar una canción?</h3>
+    <p>
+        Cuando escuchamos música, percibimos ritmo, intensidad, cambios,
+        textura y color sonoro. Pero detrás de esa experiencia también existe
+        una señal física que puede representarse visualmente.
+    </p>
+    <p>
+        Ver una canción como señal permite identificar patrones,
+        contrastes y componentes que no siempre son evidentes solo al oído.
+    </p>
+</div>
+
+<div class="section-card">
+    <h3>El sonido como onda</h3>
+    <p>
+        Una señal de audio puede entenderse como una variación de amplitud
+        a lo largo del tiempo. Esa representación es la forma de onda,
+        y permite observar cómo cambia la señal en distintos instantes.
+    </p>
+</div>
+
+<div class="section-card">
+    <h3>El sonido como frecuencia</h3>
+    <p>
+        Además de analizar la señal en el tiempo, también se puede estudiar
+        qué frecuencias la componen. Para eso se utiliza la Transformada
+        Rápida de Fourier (FFT), que permite descomponer una señal compleja
+        en sus componentes frecuenciales.
+    </p>
+</div>
+
+<div class="section-card">
+    <h3>Música, acústica y percepción</h3>
+    <p>
+        Algunas investigaciones sugieren que ciertos rasgos acústicos pueden
+        relacionarse con percepciones emocionales o expresivas en la música.
+        Sin embargo, esta relación debe interpretarse con cuidado.
+    </p>
+</div>
+
+<div class="section-card">
+    <h3>¿Qué podrás hacer en este visor?</h3>
+    <ul>
+        <li>Cargar un archivo de audio local.</li>
+        <li>Visualizar su forma de onda en el dominio del tiempo.</li>
+        <li>Observar su contenido en frecuencia mediante FFT.</li>
+        <li>Interpretar de forma guiada lo que muestran las gráficas.</li>
+    </ul>
+</div>
+{% endblock %}
