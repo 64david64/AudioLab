@@ -66,12 +66,12 @@
         <div class="wave-controls">
             <div class="control-group">
                 <label for="view-start">Inicio de vista (s)</label>
-                <input type="number" id="view-start" min="0" step="1" value="0">
+                <input type="number" id="view-start" min="0" step="0.01" value="0">
             </div>
 
             <div class="control-group">
                 <label for="view-window">Duración visible (s)</label>
-                <input type="number" id="view-window" min="1" step="1" value="10">
+                <input type="number" id="view-window" min="0.1" step="0.01" value="10">
             </div>
 
             <div class="control-group control-button-group">
@@ -82,16 +82,33 @@
         </div>
 
         <canvas id="waveform-canvas" class="plot-canvas"></canvas>
+
+        <div class="slider-block">
+            <label for="view-slider">Navegación temporal</label>
+            <input type="range" id="view-slider" min="0" max="100" step="0.01" value="0">
+        </div>
     </div>
 
     <div class="section-card plot-box">
         <h3>Transformada rápida de Fourier (FFT)</h3>
         <p class="helper-text">
-            Aquí se mostrará la distribución del contenido en frecuencia.
+            Aquí se mostrará la distribución del contenido en frecuencia de la ventana temporal seleccionada.
         </p>
-        <div class="plot-placeholder">
-            Aquí irá la gráfica de la FFT
+
+        <div class="wave-controls">
+            <div class="control-group">
+                <label for="fft-max-frequency">Frecuencia máxima visible (Hz)</label>
+                <input type="number" id="fft-max-frequency" min="100" step="100" value="5000">
+            </div>
+
+            <div class="control-group control-button-group">
+                <button type="button" class="primary-btn" id="update-fft-btn">
+                    Actualizar FFT
+                </button>
+            </div>
         </div>
+
+        <canvas id="fft-canvas" class="plot-canvas"></canvas>
     </div>
 </div>
 {% endblock %}
