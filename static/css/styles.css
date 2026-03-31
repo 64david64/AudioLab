@@ -28,7 +28,7 @@
     --radius-btn: 10px;
     --radius-nav: 8px;
 
-    --content-width: 1200px;
+    --content-width: 1440px;
 }
 
 html {
@@ -40,10 +40,6 @@ body {
     background-color: var(--bg-page);
     color: var(--text-main);
 }
-
-/* =========================
-   HEADER / TOPBAR
-========================= */
 
 .topbar {
     width: 100%;
@@ -68,10 +64,6 @@ body {
     font-size: 0.95rem;
     color: var(--text-header-soft);
 }
-
-/* =========================
-   NAVIGATION
-========================= */
 
 .nav-tabs {
     display: flex;
@@ -100,19 +92,11 @@ body {
     color: var(--text-white);
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
-
 .content {
     max-width: var(--content-width);
     margin: 0 auto;
     padding: 32px 20px;
 }
-
-/* =========================
-   CARDS / SECTIONS
-========================= */
 
 .section-card {
     background-color: var(--bg-card);
@@ -145,10 +129,6 @@ body {
     margin-top: 10px;
 }
 
-/* =========================
-   BUTTONS
-========================= */
-
 .primary-btn,
 .primary-btn-link {
     display: inline-block;
@@ -169,10 +149,6 @@ body {
     background-color: var(--bg-primary-hover);
 }
 
-/* =========================
-   GRID LAYOUTS
-========================= */
-
 .section-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -189,10 +165,6 @@ body {
     gap: 24px;
 }
 
-/* =========================
-   HELPERS / TEXT
-========================= */
-
 .helper-text {
     font-size: 0.95rem;
     color: var(--text-soft);
@@ -206,10 +178,6 @@ body {
     color: var(--text-secondary);
 }
 
-/* =========================
-   FILE INPUT
-========================= */
-
 .upload-box input[type="file"] {
     margin-top: 14px;
     margin-bottom: 14px;
@@ -217,10 +185,6 @@ body {
     font-size: 0.95rem;
     color: var(--text-secondary);
 }
-
-/* =========================
-   METADATA BOX
-========================= */
 
 .metadata-box {
     display: flex;
@@ -247,10 +211,6 @@ body {
     font-weight: 600;
     color: var(--text-main);
 }
-
-/* =========================
-   CONTROLS
-========================= */
 
 .wave-controls {
     display: flex;
@@ -297,10 +257,6 @@ body {
     margin-top: 0;
 }
 
-/* =========================
-   SLIDER
-========================= */
-
 .slider-block {
     margin-top: 16px;
     display: flex;
@@ -324,10 +280,6 @@ input[type="range"]::-webkit-slider-thumb {
     cursor: pointer;
 }
 
-/* =========================
-   PLOTS
-========================= */
-
 .plot-box {
     width: 100%;
 }
@@ -342,9 +294,145 @@ input[type="range"]::-webkit-slider-thumb {
     display: block;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+.analysis-main-card {
+    padding-bottom: 20px;
+}
+
+.analysis-top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2.35fr) minmax(320px, 0.95fr);
+    gap: 20px;
+    align-items: start;
+    margin-top: 8px;
+}
+
+.analysis-bottom-row {
+    margin-top: 20px;
+}
+
+.analysis-fft-panel {
+    min-width: 0;
+}
+
+.analysis-peaks-panel {
+    min-width: 0;
+}
+
+.fft-controls {
+    margin-top: 0;
+}
+
+.fft-canvas-large {
+    height: 460px;
+}
+
+.side-card {
+    margin-top: 0;
+}
+
+.dominant-peaks-card,
+.interpretation-card {
+    padding: 18px;
+    border: 1px solid var(--border-soft);
+    border-radius: 12px;
+    background-color: #f8fafc;
+}
+
+.dominant-peaks-card h4,
+.interpretation-card h4 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.dominant-peaks-output {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text-secondary);
+}
+
+.peak-item {
+    display: grid;
+    grid-template-columns: 82px 72px 1fr;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    border: 1px solid var(--border-soft);
+    align-items: center;
+}
+
+.peak-freq {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.peak-note {
+    font-weight: 600;
+    color: var(--bg-primary);
+}
+
+.peak-mag {
+    color: var(--text-soft);
+    font-size: 0.92rem;
+}
+
+.band-summary {
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+
+.band-summary-horizontal {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+}
+
+.band-item {
+    background-color: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.band-label {
+    font-size: 0.92rem;
+    color: var(--text-soft);
+    font-weight: 600;
+}
+
+.band-value {
+    font-size: 1.12rem;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.interpretation-wide-card {
+    width: 100%;
+}
+
+.interpretation-output {
+    background-color: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+@media (max-width: 1200px) {
+    .analysis-top-row {
+        grid-template-columns: 1fr;
+    }
+
+    .fft-canvas-large {
+        height: 400px;
+    }
+}
 
 @media (max-width: 900px) {
     .topbar {
@@ -355,6 +443,12 @@ input[type="range"]::-webkit-slider-thumb {
     .nav-tabs {
         width: 100%;
         justify-content: flex-start;
+    }
+}
+
+@media (max-width: 760px) {
+    .band-summary-horizontal {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -405,5 +499,14 @@ input[type="range"]::-webkit-slider-thumb {
 
     .plot-canvas {
         height: 260px;
+    }
+
+    .fft-canvas-large {
+        height: 300px;
+    }
+
+    .peak-item {
+        grid-template-columns: 1fr;
+        gap: 6px;
     }
 }

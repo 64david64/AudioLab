@@ -17,6 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const viewSlider = document.getElementById("view-slider");
 
     const fftMaxFrequencyInput = document.getElementById("fft-max-frequency");
+    const dominantPeaksOutput = document.getElementById("dominant-peaks-output");
+
+    const bandLow = document.getElementById("band-low");
+    const bandMid = document.getElementById("band-mid");
+    const bandHigh = document.getElementById("band-high");
+    const interpretationOutput = document.getElementById("interpretation-output");
 
     const waveformCanvas = document.getElementById("waveform-canvas");
     const waveformCtx = waveformCanvas.getContext("2d");
@@ -37,6 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function formatInputValue(value) {
         return Number(value.toFixed(2)).toString();
+    }
+
+    function formatMagnitude(value) {
+        return value.toFixed(5);
+    }
+
+    function formatPercentage(value) {
+        return `${(value * 100).toFixed(1)}%`;
     }
 
     function resizeCanvasToDisplaySize(canvas) {
@@ -65,6 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+    }
+
+    function resetInterpretation() {
+        if (dominantPeaksOutput) {
+            dominantPeaksOutput.textContent = "Aún no hay datos disponibles.";
+        }
+
+        if (bandLow) bandLow.textContent = "—";
+        if (bandMid) bandMid.textContent = "—";
+        if (bandHigh) bandHigh.textContent = "—";
+        if (interpretationOutput) {
+            interpretationOutput.textContent = "Aún no hay interpretación disponible.";
+        }
     }
 
     function getValidatedViewRange(audioBuffer) {
@@ -213,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
         waveformCtx.restore();
     }
 
-    function drawFftAxes(maxFrequency, plotLeft, plotTop, plotWidth, plotHeight) {
+    function drawFftAxes(maxFrequency, maxMagnitude, plotLeft, plotTop, plotWidth, plotHeight) {
         const plotBottom = plotTop + plotHeight;
         const plotRight = plotLeft + plotWidth;
 
@@ -253,7 +280,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         fftCtx.textAlign = "right";
         fftCtx.textBaseline = "middle";
-        fftCtx.fillText("Mag", plotLeft - 8, plotTop + 10);
+
+        const yTickCount = 4;
+        for (let i = 0; i <= yTickCount; i++) {
+            const ratio = i / yTickCount;
+            const y = plotBottom - ratio * plotHeight;
+            const magValue = maxMagnitude * ratio;
+
+            fftCtx.strokeStyle = "#e5e7eb";
+            fftCtx.beginPath();
+            fftCtx.moveTo(plotLeft, y);
+            fftCtx.lineTo(plotRight, y);
+            fftCtx.stroke();
+
+            fftCtx.fillStyle = "#64748b";
+            fftCtx.fillText(magValue.toFixed(3), plotLeft - 8, y);
+        }
 
         fftCtx.restore();
     }
@@ -327,6 +369,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const start = x * samplesPerPixel;
             const end = Math.min(start + samplesPerPixel, visibleData.length);
 
+            if (start >= visibleData.length) break;
+
             let min = 1;
             let max = -1;
 
@@ -351,6 +395,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function applyHannWindow(signal) {
         const N = signal.length;
         const windowed = new Float32Array(N);
+
+        if (N <= 1) return signal;
 
         for (let n = 0; n < N; n++) {
             const w = 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1)));
@@ -427,6 +473,127 @@ document.addEventListener("DOMContentLoaded", () => {
         return selected.sort((a, b) => a.freq - b.freq);
     }
 
+    function frequencyToNote(freq) {
+        if (!freq || freq <= 0) return "—";
+
+        const A4 = 440;
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        const midi = Math.round(69 + 12 * Math.log2(freq / A4));
+        const noteName = noteNames[((midi % 12) + 12) % 12];
+        const octave = Math.floor(midi / 12) - 1;
+
+        return `${noteName}${octave}`;
+    }
+
+    function renderDominantPeaks(peaks) {
+        if (!dominantPeaksOutput) return;
+
+        if (!peaks || peaks.length === 0) {
+            dominantPeaksOutput.textContent = "No se detectaron picos dominantes en el rango seleccionado.";
+            return;
+        }
+
+        dominantPeaksOutput.innerHTML = peaks.map(peak => `
+            <div class="peak-item">
+                <div class="peak-freq">${Math.round(peak.freq)} Hz</div>
+                <div class="peak-note">${frequencyToNote(peak.freq)}</div>
+                <div class="peak-mag">Magnitud relativa: ${formatMagnitude(peak.mag)}</div>
+            </div>
+        `).join("");
+    }
+
+    function classifyFrequencyBands(peaks) {
+        const bands = {
+            low: { count: 0, energy: 0 },
+            mid: { count: 0, energy: 0 },
+            high: { count: 0, energy: 0 }
+        };
+
+        peaks.forEach(peak => {
+            const f = peak.freq;
+            const mag = peak.mag;
+
+            if (f < 250) {
+                bands.low.count++;
+                bands.low.energy += mag;
+            } else if (f < 2000) {
+                bands.mid.count++;
+                bands.mid.energy += mag;
+            } else {
+                bands.high.count++;
+                bands.high.energy += mag;
+            }
+        });
+
+        return bands;
+    }
+
+    function normalizeBands(bands) {
+        const totalEnergy = bands.low.energy + bands.mid.energy + bands.high.energy;
+
+        if (totalEnergy === 0) {
+            return { low: 0, mid: 0, high: 0 };
+        }
+
+        return {
+            low: bands.low.energy / totalEnergy,
+            mid: bands.mid.energy / totalEnergy,
+            high: bands.high.energy / totalEnergy
+        };
+    }
+
+    function buildInterpretationText(normalized) {
+        const entries = [
+            { key: "low", label: "graves", value: normalized.low },
+            { key: "mid", label: "medios", value: normalized.mid },
+            { key: "high", label: "agudos", value: normalized.high }
+        ].sort((a, b) => b.value - a.value);
+
+        const strongest = entries[0];
+        const second = entries[1];
+
+        if (strongest.value < 0.45) {
+            return "La distribución entre bandas es relativamente balanceada. No se observa un predominio muy marcado de una sola zona del espectro dentro de los picos principales.";
+        }
+
+        if (strongest.key === "low") {
+            return second.key === "mid"
+                ? "Predominan los graves, con apoyo importante en medios. Esto sugiere una base sonora con peso y cuerpo, posiblemente asociada a bajo, bombo o acompañamiento de baja frecuencia."
+                : "Predominan claramente los graves. La ventana analizada concentra buena parte de sus picos principales en frecuencias bajas, lo que aporta profundidad y soporte rítmico.";
+        }
+
+        if (strongest.key === "mid") {
+            return second.key === "low"
+                ? "Predominan los medios, con presencia secundaria de graves. Esto suele relacionarse con contenido melódico o vocal más perceptible y una estructura sonora centrada en la zona media."
+                : "Predominan los medios. La energía principal de los picos detectados cae en la región donde suelen destacar voces, guitarras, teclados y muchos elementos melódicos.";
+        }
+
+        return second.key === "mid"
+            ? "Predominan los agudos, acompañados por medios. Esto apunta a un contenido más brillante, con presencia de armónicos altos, platillos u otros elementos de timbre incisivo."
+            : "Predominan claramente los agudos. En esta ventana resaltan componentes de brillo y detalle fino por encima del peso grave.";
+    }
+
+    function renderInterpretation(peaks) {
+        if (!bandLow || !bandMid || !bandHigh || !interpretationOutput) return;
+
+        if (!peaks || peaks.length === 0) {
+            bandLow.textContent = "—";
+            bandMid.textContent = "—";
+            bandHigh.textContent = "—";
+            interpretationOutput.textContent = "No hay interpretación disponible para esta selección.";
+            return;
+        }
+
+        const bands = classifyFrequencyBands(peaks);
+        const normalized = normalizeBands(bands);
+
+        bandLow.textContent = formatPercentage(normalized.low);
+        bandMid.textContent = formatPercentage(normalized.mid);
+        bandHigh.textContent = formatPercentage(normalized.high);
+        interpretationOutput.textContent = buildInterpretationText(normalized);
+    }
+
     function drawFftPeakLabels(peaks, fftMaxFrequency, maxMagnitude, plotLeft, plotBottom, plotWidth, plotHeight) {
         if (!peaks || peaks.length === 0) return;
 
@@ -439,7 +606,6 @@ document.addEventListener("DOMContentLoaded", () => {
         peaks.forEach((peak) => {
             const x = plotLeft + (peak.freq / fftMaxFrequency) * plotWidth;
             const rawY = plotBottom - (peak.mag / maxMagnitude) * plotHeight;
-
             const y = Math.max(rawY, 28);
 
             fftCtx.strokeStyle = "#111827";
@@ -479,7 +645,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const { visibleData, sampleRate } = getVisibleChannelData(audioBuffer);
 
         if (visibleData.length < 64) {
-            drawEmptyState(fftCtx, fftCanvas, "La ventana temporal es demasiado pequeña para calcular la FFT");
+            drawEmptyState(fftCtx, fftCanvas, "La ventana temporal es demasiado pequeña para calcular la DFT");
+            renderDominantPeaks([]);
+            renderInterpretation([]);
             return;
         }
 
@@ -496,6 +664,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (filteredData.length === 0) {
             drawEmptyState(fftCtx, fftCanvas, "No hay datos espectrales en el rango seleccionado");
+            renderDominantPeaks([]);
+            renderInterpretation([]);
             return;
         }
 
@@ -514,7 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const plotHeight = fftCanvas.height - padding.top - padding.bottom;
         const plotBottom = plotTop + plotHeight;
 
-        drawFftAxes(fftMaxFrequency, plotLeft, plotTop, plotWidth, plotHeight);
+        drawFftAxes(fftMaxFrequency, maxMagnitude, plotLeft, plotTop, plotWidth, plotHeight);
 
         fftCtx.save();
         fftCtx.strokeStyle = "#dc2626";
@@ -536,6 +706,19 @@ document.addEventListener("DOMContentLoaded", () => {
         fftCtx.restore();
 
         const dominantPeaks = findDominantPeaks(filteredData, 5, 120);
+
+        fftCtx.save();
+        fftCtx.fillStyle = "#2563eb";
+        dominantPeaks.forEach((peak) => {
+            const x = plotLeft + (peak.freq / fftMaxFrequency) * plotWidth;
+            const y = plotBottom - (peak.mag / maxMagnitude) * plotHeight;
+
+            fftCtx.beginPath();
+            fftCtx.arc(x, y, 3, 0, Math.PI * 2);
+            fftCtx.fill();
+        });
+        fftCtx.restore();
+
         drawFftPeakLabels(
             dominantPeaks,
             fftMaxFrequency,
@@ -545,6 +728,9 @@ document.addEventListener("DOMContentLoaded", () => {
             plotWidth,
             plotHeight
         );
+
+        renderDominantPeaks(dominantPeaks);
+        renderInterpretation(dominantPeaks);
     }
 
     function renderPlots() {
@@ -575,10 +761,11 @@ document.addEventListener("DOMContentLoaded", () => {
             metaChannels.textContent = channels === 1 ? "Mono" : `${channels} canales`;
 
             viewStartInput.value = "0";
-            viewWindowInput.value = "10";
+            viewWindowInput.value = formatInputValue(Math.min(10, audioBuffer.duration));
             fftMaxFrequencyInput.value = "5000";
 
             updateSliderBounds(audioBuffer);
+            resetInterpretation();
 
             drawEmptyState(
                 waveformCtx,
@@ -589,16 +776,17 @@ document.addEventListener("DOMContentLoaded", () => {
             drawEmptyState(
                 fftCtx,
                 fftCanvas,
-                "Pulsa “Procesar audio” para ver el espectro de frecuencia"
+                "Pulsa “Procesar audio” para ver la DFT de la ventana seleccionada"
             );
         } catch (error) {
             console.error(error);
             fileStatus.textContent = "Error al procesar el archivo.";
             currentAudioBuffer = null;
             plotsRendered = false;
+            resetInterpretation();
 
             drawEmptyState(waveformCtx, waveformCanvas, "No se pudo cargar la forma de onda");
-            drawEmptyState(fftCtx, fftCanvas, "No se pudo calcular la FFT");
+            drawEmptyState(fftCtx, fftCanvas, "No se pudo calcular la DFT");
         }
     });
 
@@ -650,6 +838,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    viewStartInput.addEventListener("change", () => {
+        if (!currentAudioBuffer) return;
+
+        updateSliderBounds(currentAudioBuffer);
+
+        if (plotsRendered) {
+            renderPlots();
+        }
+    });
+
+    fftMaxFrequencyInput.addEventListener("change", () => {
+        if (!currentAudioBuffer) return;
+
+        if (plotsRendered) {
+            drawFFT(currentAudioBuffer);
+        }
+    });
+
     window.addEventListener("resize", () => {
         if (plotsRendered && currentAudioBuffer) {
             renderPlots();
@@ -662,7 +868,7 @@ document.addEventListener("DOMContentLoaded", () => {
             drawEmptyState(
                 fftCtx,
                 fftCanvas,
-                "Pulsa “Procesar audio” para ver el espectro de frecuencia"
+                "Pulsa “Procesar audio” para ver la DFT de la ventana seleccionada"
             );
         }
     });
@@ -675,6 +881,8 @@ document.addEventListener("DOMContentLoaded", () => {
     drawEmptyState(
         fftCtx,
         fftCanvas,
-        "Pulsa “Procesar audio” para ver el espectro de frecuencia"
+        "Pulsa “Procesar audio” para ver la DFT de la ventana seleccionada"
     );
+
+    resetInterpretation();
 });

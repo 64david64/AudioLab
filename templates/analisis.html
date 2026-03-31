@@ -89,26 +89,73 @@
         </div>
     </div>
 
-    <div class="section-card plot-box">
-        <h3>Transformada rápida de Fourier (FFT)</h3>
+    <div class="section-card analysis-main-card">
+        <h3>Transformada discreta de Fourier (DFT)</h3>
         <p class="helper-text">
             Aquí se mostrará la distribución del contenido en frecuencia de la ventana temporal seleccionada.
         </p>
 
-        <div class="wave-controls">
-            <div class="control-group">
-                <label for="fft-max-frequency">Frecuencia máxima visible (Hz)</label>
-                <input type="number" id="fft-max-frequency" min="100" step="100" value="5000">
+        <div class="analysis-top-row">
+            <div class="analysis-fft-panel">
+                <div class="wave-controls fft-controls">
+                    <div class="control-group">
+                        <label for="fft-max-frequency">Frecuencia máxima visible (Hz)</label>
+                        <input type="number" id="fft-max-frequency" min="100" step="100" value="5000">
+                    </div>
+
+                    <div class="control-group control-button-group">
+                        <button type="button" class="primary-btn" id="update-fft-btn">
+                            Actualizar DFT
+                        </button>
+                    </div>
+                </div>
+
+                <canvas id="fft-canvas" class="plot-canvas fft-canvas-large"></canvas>
             </div>
 
-            <div class="control-group control-button-group">
-                <button type="button" class="primary-btn" id="update-fft-btn">
-                    Actualizar FFT
-                </button>
-            </div>
+            <aside class="analysis-peaks-panel">
+                <div class="dominant-peaks-card side-card">
+                    <h4>Frecuencias dominantes detectadas</h4>
+                    <p class="helper-text">
+                        Se muestran los picos principales dentro del rango de frecuencias visible.
+                    </p>
+                    <div id="dominant-peaks-output" class="dominant-peaks-output">
+                        Aún no hay datos disponibles.
+                    </div>
+                </div>
+            </aside>
         </div>
 
-        <canvas id="fft-canvas" class="plot-canvas"></canvas>
+        <div class="analysis-bottom-row">
+            <div class="interpretation-card interpretation-wide-card">
+                <h4>Interpretación automática básica</h4>
+                <p class="helper-text">
+                    Esta primera interpretación resume cómo se distribuyen los picos detectados
+                    entre graves, medios y agudos.
+                </p>
+
+                <div class="band-summary band-summary-horizontal">
+                    <div class="band-item">
+                        <span class="band-label">Graves</span>
+                        <span id="band-low" class="band-value">—</span>
+                    </div>
+
+                    <div class="band-item">
+                        <span class="band-label">Medios</span>
+                        <span id="band-mid" class="band-value">—</span>
+                    </div>
+
+                    <div class="band-item">
+                        <span class="band-label">Agudos</span>
+                        <span id="band-high" class="band-value">—</span>
+                    </div>
+                </div>
+
+                <div id="interpretation-output" class="interpretation-output">
+                    Aún no hay interpretación disponible.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
