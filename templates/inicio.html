@@ -3,69 +3,261 @@
 {% block title %}Inicio | AudioLab{% endblock %}
 
 {% block content %}
-<div class="section-card hero">
-    <h2>Explora el sonido desde la física y la visualización</h2>
-    <p>
-        Este visor permite analizar un archivo de audio de forma visual,
-        observando cómo se comporta una señal sonora en el tiempo
-        y cómo se distribuye su contenido en frecuencia.
-    </p>
-    <p>
-        La idea no es solo mostrar gráficas, sino ayudarte a comprender
-        qué significan desde el procesamiento digital de señales,
-        la acústica y la física de ondas.
-    </p>
-    <a href="{{ url_for('analisis') }}" class="primary-btn-link">Comenzar análisis</a>
+
+<div class="section-card hero-card">
+    <div class="hero-grid">
+        <div class="hero-text">
+            <h2>Marco conceptual del visor de análisis de audio</h2>
+            <p class="text-emphasis">
+                El análisis digital de audio permite estudiar una señal sonora más allá de su percepción inmediata,
+                describiéndola en términos cuantificables y visuales.
+            </p>
+            <p>
+                En este contexto, una canción puede entenderse no solo como una experiencia auditiva, sino también
+                como una señal compuesta por variaciones de amplitud a lo largo del tiempo y por múltiples componentes
+                frecuenciales que coexisten de manera simultánea.
+            </p>
+            <p>
+                Este visor web fue desarrollado con el propósito de traducir esos componentes técnicos en una
+                representación visual e interpretativa accesible, articulando conceptos de física de ondas,
+                acústica y procesamiento digital de señales.
+            </p>
+        </div>
+
+        <div class="concept-visual-card">
+            <div class="concept-visual-title">Idea central</div>
+
+            <div class="concept-flow">
+                <div class="flow-node">Audio</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">Señal</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">Espectro</div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-node">Interpretación</div>
+            </div>
+
+            <p class="concept-visual-text">
+                El visor transforma un archivo de audio en una lectura visual e interpretativa de su comportamiento
+                temporal y frecuencial.
+            </p>
+        </div>
+    </div>
 </div>
 
 <div class="section-card">
-    <h3>¿Por qué mirar una canción?</h3>
-    <p>
-        Cuando escuchamos música, percibimos ritmo, intensidad, cambios,
-        textura y color sonoro. Pero detrás de esa experiencia también existe
-        una señal física que puede representarse visualmente.
+    <h3>1. El sonido como fenómeno ondulatorio</h3>
+
+    <div class="intro-split">
+        <div>
+            <p>
+                Desde el punto de vista físico, el sonido corresponde a una perturbación mecánica que se propaga en un
+                medio, generalmente el aire, en forma de onda. Estas variaciones de presión pueden describirse mediante
+                magnitudes como amplitud, frecuencia, periodo y fase, las cuales determinan características perceptibles
+                del sonido como su intensidad, su altura tonal y parte de su timbre.
+            </p>
+            <p>
+                Cuando un sonido es registrado digitalmente, esa onda continua se representa mediante una secuencia
+                discreta de muestras. Cada una de esas muestras almacena un valor numérico de amplitud en un instante
+                determinado. Así, un archivo de audio puede interpretarse como una serie temporal que conserva
+                información suficiente para reconstruir y analizar la señal original.
+            </p>
+        </div>
+
+        <div class="wave-demo-card">
+            <div class="mini-card-title">Representación conceptual</div>
+
+            <div class="wave-demo">
+                <div class="wave-axis wave-axis-x"></div>
+                <div class="wave-axis wave-axis-y"></div>
+                <div class="wave-line"></div>
+            </div>
+
+            <div class="wave-labels">
+                <span>Amplitud</span>
+                <span>Tiempo</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>2. Representación digital de la señal de audio</h3>
+
+    <div class="concept-grid">
+        <div class="concept-box">
+            <h4>Muestreo</h4>
+            <p>
+                La frecuencia de muestreo indica cuántas muestras por segundo se registran en el archivo.
+                No representa una frecuencia musical específica, sino la resolución temporal del audio digital.
+            </p>
+        </div>
+
+        <div class="concept-box">
+            <h4>Canales</h4>
+            <p>
+                Un archivo puede contener uno o varios canales. En esta versión del visor, el análisis se realiza
+                sobre un único canal como simplificación metodológica suficiente para la V1.
+            </p>
+        </div>
+
+        <div class="concept-box">
+            <h4>Muestras</h4>
+            <p>
+                Cada muestra corresponde a un valor numérico de amplitud en un instante específico, permitiendo
+                reconstruir la señal y estudiarla computacionalmente.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>3. Dominio del tiempo y dominio de la frecuencia</h3>
+
+    <p class="text-emphasis">
+        Una misma señal puede analizarse desde distintos dominios de representación, permitiendo entender tanto
+        su comportamiento temporal como su estructura frecuencial.
     </p>
-    <p>
-        Ver una canción como señal permite identificar patrones,
-        contrastes y componentes que no siempre son evidentes solo al oído.
+
+    <div class="comparison-grid">
+        <div class="comparison-card">
+            <h4>Dominio del tiempo</h4>
+            <p>
+                Muestra cómo varía la amplitud de la señal a lo largo del tiempo. Permite observar eventos, cambios
+                de energía, ataques sonoros y patrones temporales generales.
+            </p>
+            <div class="mini-plot time-plot"></div>
+        </div>
+
+        <div class="comparison-card">
+            <h4>Dominio de la frecuencia</h4>
+            <p>
+                Muestra qué frecuencias componen la señal y con qué magnitud participan. Permite identificar
+                estructura espectral, distribución de energía y componentes dominantes.
+            </p>
+            <div class="mini-plot freq-plot">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <p class="section-note">
+        Una misma señal puede verse como una forma de onda continua en el tiempo y, al mismo tiempo, como una
+        combinación de múltiples componentes en frecuencia.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>El sonido como onda</h3>
+    <h3>4. Transformada discreta de Fourier y análisis espectral</h3>
+
+    <p class="text-emphasis">
+        Para estudiar el contenido frecuencial de la señal, este visor emplea una Transformada Discreta de Fourier
+        (DFT) aplicada sobre una ventana temporal seleccionada.
+    </p>
     <p>
-        Una señal de audio puede entenderse como una variación de amplitud
-        a lo largo del tiempo. Esa representación es la forma de onda,
-        y permite observar cómo cambia la señal en distintos instantes.
+        Conceptualmente, esta operación permite estimar cuánto contribuye cada frecuencia a la composición del
+        fragmento analizado.
+    </p>
+    <p>
+        En esta V1 se implementa una DFT manual, en lugar de una FFT optimizada, con una finalidad principalmente
+        didáctica: hacer explícita la lógica del análisis espectral sin introducir complejidad algorítmica adicional.
+    </p>
+
+    <div class="pipeline-card">
+        <div class="pipeline-step">Ventana temporal</div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">Ventana de Hann</div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">DFT</div>
+        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-step">Espectro</div>
+    </div>
+
+    <p>
+        Antes del cálculo espectral se aplica una <strong>ventana de Hann</strong>, con el fin de reducir
+        discontinuidades en los extremos del segmento analizado y mejorar la lectura del espectro resultante.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>El sonido como frecuencia</h3>
+    <h3>5. Detección de picos y lectura interpretativa</h3>
     <p>
-        Además de analizar la señal en el tiempo, también se puede estudiar
-        qué frecuencias la componen. Para eso se utiliza la Transformada
-        Rápida de Fourier (FFT), que permite descomponer una señal compleja
-        en sus componentes frecuenciales.
+        Una vez calculado el espectro, el visor identifica picos dominantes mediante criterios simples de máximos
+        locales, umbral relativo de magnitud y separación mínima entre frecuencias. A partir de estos picos,
+        se construye una lectura resumida del comportamiento espectral del fragmento.
+    </p>
+
+    <div class="concept-grid two-columns">
+        <div class="concept-box">
+            <h4>Pico individual más intenso</h4>
+            <p>
+                Corresponde a una frecuencia puntual que sobresale dentro del espectro. No necesariamente representa
+                la banda que domina la distribución global.
+            </p>
+        </div>
+
+        <div class="concept-box">
+            <h4>Banda predominante</h4>
+            <p>
+                Resume la distribución general de energía entre graves, medios y agudos, permitiendo una lectura
+                más estructural del fragmento analizado.
+            </p>
+        </div>
+    </div>
+
+    <p>
+        Esta diferencia es importante, ya que una sola frecuencia puede resaltar de forma aislada sin que ello
+        implique que toda la estructura espectral esté dominada por esa misma zona.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Música, acústica y percepción</h3>
+    <h3>6. Alcance de esta versión del visor</h3>
     <p>
-        Algunas investigaciones sugieren que ciertos rasgos acústicos pueden
-        relacionarse con percepciones emocionales o expresivas en la música.
-        Sin embargo, esta relación debe interpretarse con cuidado.
+        Esta primera versión del sistema fue concebida como una herramienta de exploración visual e interpretativa.
+        Su propósito no es identificar instrumentos de manera automática, clasificar emociones musicales ni reemplazar
+        herramientas avanzadas de análisis acústico, sino ofrecer una base sólida para observar, comprender y
+        comunicar el comportamiento de una señal de audio.
+    </p>
+    <p>
+        En consecuencia, el valor principal del visor no se encuentra en reinventar algoritmos existentes, sino
+        en la forma en que organiza la visualización, guía la lectura del espectro y transforma resultados técnicos
+        en explicaciones más claras para el usuario.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>¿Qué podrás hacer en este visor?</h3>
-    <ul>
-        <li>Cargar un archivo de audio local.</li>
-        <li>Visualizar su forma de onda en el dominio del tiempo.</li>
-        <li>Observar su contenido en frecuencia mediante FFT.</li>
-        <li>Interpretar de forma guiada lo que muestran las gráficas.</li>
-    </ul>
+    <h3>7. Función de la pestaña de análisis</h3>
+    <p>
+        En la pestaña <strong>Análisis</strong>, el usuario puede cargar un archivo de audio, explorar diferentes
+        ventanas temporales y observar cómo cambian la forma de onda, el espectro y la interpretación automática
+        conforme se desplaza a lo largo de la señal.
+    </p>
+    <p>
+        De esta manera, el visor no presenta un único resultado estático, sino una lectura localizada y dinámica
+        del comportamiento sonoro, permitiendo estudiar cómo evoluciona el contenido frecuencial dentro de una
+        misma pieza musical.
+    </p>
 </div>
+
+<div class="section-card cta-card">
+    <div class="cta-content">
+        <div>
+            <h3>Explorar el análisis en la práctica</h3>
+            <p>
+                Una vez comprendidos los conceptos básicos, puedes dirigirte a la pestaña de análisis para observar
+                cómo se comporta una señal real en el tiempo y en la frecuencia.
+            </p>
+        </div>
+
+        <a href="{{ url_for('analisis') }}" class="cta-button">
+            Ir al análisis →
+        </a>
+    </div>
+</div>
+
 {% endblock %}

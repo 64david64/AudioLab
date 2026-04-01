@@ -24,6 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const bandHigh = document.getElementById("band-high");
     const interpretationOutput = document.getElementById("interpretation-output");
 
+    const bandCardLow = document.getElementById("band-card-low");
+    const bandCardMid = document.getElementById("band-card-mid");
+    const bandCardHigh = document.getElementById("band-card-high");
+
     const waveformCanvas = document.getElementById("waveform-canvas");
     const waveformCtx = waveformCanvas.getContext("2d");
 
@@ -89,6 +93,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bandLow) bandLow.textContent = "—";
         if (bandMid) bandMid.textContent = "—";
         if (bandHigh) bandHigh.textContent = "—";
+
+        if (bandCardLow) bandCardLow.classList.remove("is-dominant", "low", "mid", "high");
+        if (bandCardMid) bandCardMid.classList.remove("is-dominant", "low", "mid", "high");
+        if (bandCardHigh) bandCardHigh.classList.remove("is-dominant", "low", "mid", "high");
+
         if (interpretationOutput) {
             interpretationOutput.textContent = "Aún no hay interpretación disponible.";
         }
@@ -300,6 +309,33 @@ document.addEventListener("DOMContentLoaded", () => {
         fftCtx.restore();
     }
 
+    function drawFrequencyBandsBackground(ctx, plotLeft, plotTop, plotWidth, plotHeight, maxFrequency, dominantBand) {
+        const bands = [
+            { key: "low", max: 250, baseColor: [59, 130, 246] },
+            { key: "mid", max: 2000, baseColor: [34, 197, 94] },
+            { key: "high", max: maxFrequency, baseColor: [239, 68, 68] }
+        ];
+
+        let currentStartFreq = 0;
+
+        bands.forEach((band) => {
+            const bandEndFreq = Math.min(band.max, maxFrequency);
+            if (bandEndFreq <= currentStartFreq) return;
+
+            const xStart = plotLeft + (currentStartFreq / maxFrequency) * plotWidth;
+            const xEnd = plotLeft + (bandEndFreq / maxFrequency) * plotWidth;
+
+            const isDominant = band.key === dominantBand;
+            const opacity = isDominant ? 0.28 : 0.10;
+
+            const [r, g, b] = band.baseColor;
+            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+            ctx.fillRect(xStart, plotTop, xEnd - xStart, plotHeight);
+
+            currentStartFreq = bandEndFreq;
+        });
+    }
+
     function getVisibleChannelData(audioBuffer) {
         const channelData = audioBuffer.getChannelData(0);
         const sampleRate = audioBuffer.sampleRate;
@@ -494,13 +530,23 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        dominantPeaksOutput.innerHTML = peaks.map(peak => `
-            <div class="peak-item">
-                <div class="peak-freq">${Math.round(peak.freq)} Hz</div>
-                <div class="peak-note">${frequencyToNote(peak.freq)}</div>
-                <div class="peak-mag">Magnitud relativa: ${formatMagnitude(peak.mag)}</div>
-            </div>
-        `).join("");
+        const mainPeak = [...peaks].sort((a, b) => b.mag - a.mag)[0];
+
+        dominantPeaksOutput.innerHTML = peaks.map(peak => {
+            const isMainPeak = peak === mainPeak;
+            const mainBadge = isMainPeak ? `<span class="peak-badge">Pico principal</span>` : "";
+
+            return `
+                <div class="peak-item ${isMainPeak ? "is-main-peak" : ""}">
+                    <div class="peak-freq">
+                        ${Math.round(peak.freq)} Hz
+                        ${mainBadge}
+                    </div>
+                    <div class="peak-note">${frequencyToNote(peak.freq)}</div>
+                    <div class="peak-mag">Magnitud relativa: ${formatMagnitude(peak.mag)}</div>
+                </div>
+            `;
+        }).join("");
     }
 
     function classifyFrequencyBands(peaks) {
@@ -510,18 +556,20 @@ document.addEventListener("DOMContentLoaded", () => {
             high: { count: 0, energy: 0 }
         };
 
-        peaks.forEach(peak => {
+        if (!peaks || peaks.length === 0) return bands;
+
+        peaks.forEach((peak) => {
             const f = peak.freq;
             const mag = peak.mag;
 
             if (f < 250) {
-                bands.low.count++;
+                bands.low.count += 1;
                 bands.low.energy += mag;
             } else if (f < 2000) {
-                bands.mid.count++;
+                bands.mid.count += 1;
                 bands.mid.energy += mag;
             } else {
-                bands.high.count++;
+                bands.high.count += 1;
                 bands.high.energy += mag;
             }
         });
@@ -532,7 +580,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function normalizeBands(bands) {
         const totalEnergy = bands.low.energy + bands.mid.energy + bands.high.energy;
 
-        if (totalEnergy === 0) {
+        if (totalEnergy <= 0) {
             return { low: 0, mid: 0, high: 0 };
         }
 
@@ -543,55 +591,155 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    function buildInterpretationText(normalized) {
-        const entries = [
+    function getDominantBandKey(normalized) {
+        let dominantBand = "mid";
+
+        if (normalized.low > normalized.mid && normalized.low > normalized.high) {
+            dominantBand = "low";
+        } else if (normalized.high > normalized.mid && normalized.high > normalized.low) {
+            dominantBand = "high";
+        }
+
+        return dominantBand;
+    }
+
+    function buildInterpretationText(normalized, peaks) {
+        if (!peaks || peaks.length === 0) {
+            return "No hay suficientes picos detectados para generar una interpretación.";
+        }
+
+        if (peaks.length <= 2) {
+            const mainPeak = peaks[0];
+            const freq = Math.round(mainPeak.freq);
+            const note = frequencyToNote(mainPeak.freq);
+
+            return `Se detectan muy pocos componentes dominantes en esta ventana, lo que sugiere una señal simple o poco compleja. El componente principal se encuentra alrededor de ${freq} Hz (${note}).`;
+        }
+
+        const orderedBands = [
             { key: "low", label: "graves", value: normalized.low },
             { key: "mid", label: "medios", value: normalized.mid },
             { key: "high", label: "agudos", value: normalized.high }
         ].sort((a, b) => b.value - a.value);
 
-        const strongest = entries[0];
-        const second = entries[1];
+        const strongest = orderedBands[0];
+        const second = orderedBands[1];
+        const weakest = orderedBands[2];
 
-        if (strongest.value < 0.45) {
-            return "La distribución entre bandas es relativamente balanceada. No se observa un predominio muy marcado de una sola zona del espectro dentro de los picos principales.";
+        const spread = strongest.value - weakest.value;
+
+        const mainPeak = [...peaks].sort((a, b) => b.mag - a.mag)[0];
+        const mainPeakFreq = Math.round(mainPeak.freq);
+        const mainPeakNote = frequencyToNote(mainPeak.freq);
+
+        let mainPeakBand = "mid";
+        let mainPeakBandLabel = "medios";
+
+        if (mainPeak.freq < 250) {
+            mainPeakBand = "low";
+            mainPeakBandLabel = "graves";
+        } else if (mainPeak.freq < 2000) {
+            mainPeakBand = "mid";
+            mainPeakBandLabel = "medios";
+        } else {
+            mainPeakBand = "high";
+            mainPeakBandLabel = "agudos";
         }
 
-        if (strongest.key === "low") {
-            return second.key === "mid"
-                ? "Predominan los graves, con apoyo importante en medios. Esto sugiere una base sonora con peso y cuerpo, posiblemente asociada a bajo, bombo o acompañamiento de baja frecuencia."
-                : "Predominan claramente los graves. La ventana analizada concentra buena parte de sus picos principales en frecuencias bajas, lo que aporta profundidad y soporte rítmico.";
+        let text = "";
+
+        if (spread < 0.12) {
+            text += "El contenido del espectro está muy distribuido entre las diferentes bandas, sin una predominancia clara. ";
+            text += "Esto puede corresponder a una señal con características más homogéneas o sin componentes fuertemente dominantes. ";
+        } else {
+            if (strongest.value >= 0.60) {
+                text += `Se observa un predominio claro de las frecuencias ${strongest.label}. `;
+            } else if (strongest.value >= 0.45) {
+                text += `Predominan las frecuencias ${strongest.label}, con cierta presencia de ${second.label}. `;
+            } else {
+                text += "El contenido del sonido se encuentra relativamente distribuido entre varias bandas de frecuencia. ";
+            }
+
+            if (spread >= 0.45) {
+                text += "Gran parte de la energía está concentrada en una zona específica del espectro. ";
+            } else if (spread >= 0.20) {
+                text += "Aunque hay una zona predominante, también se observa participación de otras bandas. ";
+            } else {
+                text += "Las frecuencias están repartidas de manera relativamente uniforme. ";
+            }
+
+            if (strongest.key === "low") {
+                text += "Esto suele asociarse con una sensación de profundidad o base rítmica en el sonido. ";
+            } else if (strongest.key === "mid") {
+                text += "Esto indica una fuerte presencia en la zona donde suelen encontrarse muchos elementos melódicos. ";
+            } else {
+                text += "Esto sugiere una presencia notable de brillo y detalle en el sonido. ";
+            }
         }
 
-        if (strongest.key === "mid") {
-            return second.key === "low"
-                ? "Predominan los medios, con presencia secundaria de graves. Esto suele relacionarse con contenido melódico o vocal más perceptible y una estructura sonora centrada en la zona media."
-                : "Predominan los medios. La energía principal de los picos detectados cae en la región donde suelen destacar voces, guitarras, teclados y muchos elementos melódicos.";
+        if (mainPeakBand !== strongest.key) {
+            text += `Aunque el pico más intenso aparece en la zona de ${mainPeakBandLabel}, no coincide con la banda predominante, lo que indica que una frecuencia puntual puede destacar sin representar toda la distribución del sonido. `;
+        } else {
+            text += `El pico principal también se encuentra en la zona de ${mainPeakBandLabel}, en coherencia con la distribución general. `;
         }
 
-        return second.key === "mid"
-            ? "Predominan los agudos, acompañados por medios. Esto apunta a un contenido más brillante, con presencia de armónicos altos, platillos u otros elementos de timbre incisivo."
-            : "Predominan claramente los agudos. En esta ventana resaltan componentes de brillo y detalle fino por encima del peso grave.";
+        text += `El componente más destacado se encuentra alrededor de ${mainPeakFreq} Hz (${mainPeakNote}).`;
+
+        return text;
+    }
+
+    function highlightDominantBandCard(dominantBand) {
+        const cards = [
+            { key: "low", element: bandCardLow },
+            { key: "mid", element: bandCardMid },
+            { key: "high", element: bandCardHigh }
+        ];
+
+        cards.forEach(({ key, element }) => {
+            if (!element) return;
+
+            element.classList.remove("is-dominant", "low", "mid", "high");
+
+            if (dominantBand && key === dominantBand) {
+                element.classList.add("is-dominant", dominantBand);
+            }
+        });
     }
 
     function renderInterpretation(peaks) {
-        if (!bandLow || !bandMid || !bandHigh || !interpretationOutput) return;
+        if (!interpretationOutput && !bandLow && !bandMid && !bandHigh) return;
 
         if (!peaks || peaks.length === 0) {
-            bandLow.textContent = "—";
-            bandMid.textContent = "—";
-            bandHigh.textContent = "—";
-            interpretationOutput.textContent = "No hay interpretación disponible para esta selección.";
+            if (bandLow) bandLow.textContent = "—";
+            if (bandMid) bandMid.textContent = "—";
+            if (bandHigh) bandHigh.textContent = "—";
+
+            highlightDominantBandCard(null);
+
+            if (interpretationOutput) {
+                interpretationOutput.textContent = "No hay interpretación disponible para esta selección.";
+            }
             return;
         }
 
         const bands = classifyFrequencyBands(peaks);
         const normalized = normalizeBands(bands);
+        const dominantBand = getDominantBandKey(normalized);
 
-        bandLow.textContent = formatPercentage(normalized.low);
-        bandMid.textContent = formatPercentage(normalized.mid);
-        bandHigh.textContent = formatPercentage(normalized.high);
-        interpretationOutput.textContent = buildInterpretationText(normalized);
+        if (bandLow) bandLow.textContent = formatPercentage(normalized.low);
+        if (bandMid) bandMid.textContent = formatPercentage(normalized.mid);
+        if (bandHigh) bandHigh.textContent = formatPercentage(normalized.high);
+
+        highlightDominantBandCard(dominantBand);
+
+        if (interpretationOutput) {
+            const text = buildInterpretationText(normalized, peaks);
+            interpretationOutput.innerHTML = `
+                <div class="interp-text">
+                    ${text}
+                </div>
+            `;
+        }
     }
 
     function drawFftPeakLabels(peaks, fftMaxFrequency, maxMagnitude, plotLeft, plotBottom, plotWidth, plotHeight) {
@@ -684,6 +832,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const plotHeight = fftCanvas.height - padding.top - padding.bottom;
         const plotBottom = plotTop + plotHeight;
 
+        const dominantPeaks = findDominantPeaks(filteredData, 5, 120);
+
+        const bandDistribution = classifyFrequencyBands(dominantPeaks);
+        const normalized = normalizeBands(bandDistribution);
+        const dominantBand = getDominantBandKey(normalized);
+
+        drawFrequencyBandsBackground(
+            fftCtx,
+            plotLeft,
+            plotTop,
+            plotWidth,
+            plotHeight,
+            fftMaxFrequency,
+            dominantBand
+        );
+
         drawFftAxes(fftMaxFrequency, maxMagnitude, plotLeft, plotTop, plotWidth, plotHeight);
 
         fftCtx.save();
@@ -705,18 +869,32 @@ document.addEventListener("DOMContentLoaded", () => {
         fftCtx.stroke();
         fftCtx.restore();
 
-        const dominantPeaks = findDominantPeaks(filteredData, 5, 120);
-
         fftCtx.save();
-        fftCtx.fillStyle = "#2563eb";
+
+        let mainPeak = null;
+        if (dominantPeaks.length > 0) {
+            mainPeak = [...dominantPeaks].sort((a, b) => b.mag - a.mag)[0];
+        }
+
         dominantPeaks.forEach((peak) => {
             const x = plotLeft + (peak.freq / fftMaxFrequency) * plotWidth;
             const y = plotBottom - (peak.mag / maxMagnitude) * plotHeight;
 
+            const isMain = mainPeak && peak === mainPeak;
+
             fftCtx.beginPath();
-            fftCtx.arc(x, y, 3, 0, Math.PI * 2);
+
+            if (isMain) {
+                fftCtx.fillStyle = "#f59e0b";
+                fftCtx.arc(x, y, 5, 0, Math.PI * 2);
+            } else {
+                fftCtx.fillStyle = "#2563eb";
+                fftCtx.arc(x, y, 3, 0, Math.PI * 2);
+            }
+
             fftCtx.fill();
         });
+
         fftCtx.restore();
 
         drawFftPeakLabels(

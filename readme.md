@@ -1,112 +1,41 @@
-# AudioLab — Visor de Análisis de Audio
+# AudioLab — Visor web local de análisis de audio
 
-AudioLab es un visor web local orientado a la exploración visual del audio desde el procesamiento digital de señales, la acústica y la física de ondas.
+AudioLab es un visor web local orientado a la exploración visual e interpretativa de señales de audio. Su propósito es permitir que un usuario cargue un archivo sonoro y observe, de manera progresiva y comprensible, cómo se comporta una señal en el dominio del tiempo y en el dominio de la frecuencia.
 
-Permite cargar un archivo de audio y analizarlo mediante representaciones en el dominio del tiempo (forma de onda) y, en versiones futuras, en el dominio de la frecuencia.
+El proyecto articula conceptos de:
+
+- física de ondas
+- acústica
+- procesamiento digital de señales
+- visualización interactiva
+- interpretación pedagógica de resultados
+
+Más que reinventar algoritmos existentes, AudioLab pone el foco en:
+
+- cómo se visualiza la señal
+- cómo se explica lo que ocurre
+- cómo se interpreta el resultado
+- cómo interactúa el usuario con el análisis
 
 ---
 
 ## Objetivo del proyecto
 
-El objetivo de este proyecto es construir una herramienta didáctica e interactiva que permita:
+Construir una herramienta web local que permita:
 
-- visualizar señales de audio de forma intuitiva,
-- comprender la relación entre tiempo y frecuencia,
-- explorar cómo se representa una canción desde la física,
-- y facilitar la interpretación básica de características acústicas.
-
-Este visor no busca realizar clasificación automática (ej. emociones), sino servir como herramienta de análisis y exploración.
-
----
-
-## Funcionalidades actuales (V1)
-
-Actualmente, el visor permite:
-
-- Cargar archivos de audio (`.wav`, `.mp3`, `.ogg`)
-- Visualizar metadatos:
-  - nombre del archivo
-  - duración (formato mm:ss)
-  - frecuencia de muestreo
-  - número de canales
-- Mostrar la forma de onda en el dominio del tiempo
-- Navegar la señal mediante una **ventana temporal**:
-  - definir inicio de vista
-  - definir duración visible
-- Visualizar ejes:
-  - eje temporal (segundos)
-  - amplitud normalizada (-1 a 1)
+- cargar un archivo de audio
+- visualizar su forma de onda
+- calcular y mostrar su espectro mediante DFT
+- detectar frecuencias dominantes
+- convertir frecuencias principales a notas musicales aproximadas
+- resumir la distribución entre graves, medios y agudos
+- generar una interpretación automática básica y prudente
 
 ---
 
-## Arquitectura del proyecto
+## Estructura del proyecto
 
-El proyecto está construido con una arquitectura simple y modular:
-
-### Backend
-- Python + Flask
-- Renderizado de plantillas HTML
-
-### Frontend
-- HTML + CSS (estructura y estilos)
-- JavaScript (lógica de interacción)
-
-### Procesamiento de audio
-- Web Audio API (navegador)
-- Decodificación de audio en `AudioBuffer`
-
----
-
-## Flujo de uso
-
-1. Ingresar al visor
-2. Ir a la pestaña **Análisis**
-3. Cargar un archivo de audio
-4. Presionar **Procesar audio**
-5. Ajustar la ventana temporal:
-   - inicio de vista
-   - duración visible
-6. Analizar la forma de onda resultante
-
----
-
-## Decisiones técnicas 
-
-- Se utiliza Web Audio API para evitar procesamiento innecesario en backend
-- Se trabaja con un solo archivo por análisis
-- Se usa únicamente el canal 0 (mono) para simplificar la visualización
-- La señal no se muestra completa siempre, sino mediante ventanas temporales
-- Se utiliza reducción de datos por min/max por píxel para representar la señal
-
----
-
-## Limitaciones actuales
-
-- No se ha implementado aún la FFT
-- No hay zoom interactivo con mouse
-- No hay reproducción de audio sincronizada
-- No hay selección gráfica de fragmentos
-- No hay espectrograma
-
----
-
-## Roadmap (V2)
-
-Futuras mejoras planificadas:
-
--  Implementación de FFT (dominio de frecuencia)
--  Slider de navegación temporal
--  Zoom interactivo sobre la señal
--  Reproducción de audio sincronizada con la gráfica
--  Espectrograma
--  Métricas adicionales (energía, centroid espectral, etc.)
--  Interpretación asistida de resultados
-
----
-
-##  Estructura del proyecto
-
-    acustica/
+    AudioLab/
     │
     ├── app.py
     ├── templates/
@@ -116,52 +45,314 @@ Futuras mejoras planificadas:
     │   ├── interpretacion.html
     │   └── acerca.html
     │
-    └── static/
-        ├── css/
-        │   └── styles.css
-        └── js/
-            └── script.js
+    ├── static/
+    │   ├── css/
+    │   │   └── styles.css
+    │   └── js/
+    │       └── script.js
+    │
+    └── README.md
 
 ---
 
-##  Ejecución local
+## Pestañas del visor
 
-1. Ejecutar en terminal:
+### Inicio
+Introduce el marco conceptual del análisis de audio:
+
+- sonido como onda
+- dominio del tiempo vs. frecuencia
+- qué es una DFT
+- por qué analizar música
+- relación sonido–percepción
+
+### Análisis
+Es la parte operativa del sistema:
+
+- carga de audio
+- visualización de forma de onda
+- navegación temporal
+- cálculo espectral
+- detección de picos
+- interpretación automática básica
+
+### Interpretación
+Explica cómo leer los resultados:
+
+- significado del espectro
+- picos dominantes
+- bandas de frecuencia
+- limitaciones del análisis
+
+### Acerca
+Contexto del proyecto:
+
+- decisiones metodológicas
+- alcance y limitaciones
+- referencias bibliográficas
+
+---
+
+## Funcionalidades implementadas (V1)
+
+### Carga de audio
+Formatos soportados:
+
+- `.wav` (recomendado)
+- `.mp3`
+- `.ogg`
+
+### Metadatos
+Se muestran:
+
+- nombre
+- duración
+- frecuencia de muestreo
+- canales
+
+### Procesamiento
+Se utiliza:
+
+- Web Audio API
+- acceso a `AudioBuffer`
+
+### Canal de análisis
+Se usa únicamente:
+
+- canal 0, como simplificación válida en V1
+
+### Forma de onda
+Se renderiza mediante:
+
+- reducción min/max por columna
+- optimización visual para no dibujar cada muestra de forma individual
+
+### Ventana temporal
+Control del usuario sobre:
+
+- inicio
+- duración visible
+- navegación con slider
+
+### DFT manual
+Se implementa una:
+
+- Transformada Discreta de Fourier (O(N²))
+
+Motivo:
+
+- claridad didáctica
+- control del proceso
+- suficiente para esta etapa del proyecto
+
+### Ventana de Hann
+Se aplica para:
+
+- reducir discontinuidades
+- mejorar la lectura del espectro
+
+### Espectro
+Se muestra:
+
+- frecuencia (Hz)
+- magnitud relativa
+- rango configurable
+
+### Detección de picos
+Basada en:
+
+- máximos locales
+- umbral relativo
+- separación mínima
+- límite de picos
+
+### Conversión a notas
+Ejemplos:
+
+- 440 Hz → A4
+- 261 Hz → C4
+
+### Interpretación automática
+Resume:
+
+- distribución espectral
+- predominio de bandas
+- relación entre pico principal y banda predominante
+
+---
+
+## Enfoque interpretativo
+
+El sistema distingue entre:
+
+### Pico principal
+Frecuencia puntual con mayor magnitud.
+
+### Banda predominante
+Zona del espectro con mayor energía relativa:
+
+- graves
+- medios
+- agudos
+
+No necesariamente coinciden, y esa diferencia forma parte de la interpretación.
+
+---
+
+## Decisiones metodológicas
+
+- procesamiento local
+- uso de Web Audio API
+- DFT manual
+- ventana de Hann
+- análisis monocanal
+- reglas simples de interpretación
+- enfoque pedagógico
+
+---
+
+## Qué sí hace la V1
+
+- carga audio
+- visualiza forma de onda
+- calcula espectro
+- detecta picos
+- resalta pico principal
+- clasifica bandas
+- genera interpretación básica
+
+---
+
+## Qué NO hace la V1
+
+- FFT optimizada
+- espectrograma
+- aprendizaje automático
+- identificación automática de instrumentos
+- clasificación emocional automática
+- análisis multicanal avanzado
+
+---
+
+## Caso de estudio
+
+Referencia utilizada:
+
+**"A Day in the Life" — The Beatles**
+
+Permite observar:
+
+- cambios en el espectro
+- variaciones de densidad
+- comportamiento dinámico
+
+---
+
+## UX del sistema
+
+- navegación superior
+- panel de análisis reorganizado
+- visualización simultánea de espectro, picos e interpretación
+
+Colores por bandas:
+
+- azul → graves
+- verde → medios
+- rojo → agudos
+
+---
+
+## Tecnologías utilizadas
+
+- Python
+- Flask
+- HTML
+- CSS
+- JavaScript
+- Web Audio API
+- Canvas API
+
+---
+
+## Ejecución del proyecto
+
+### 1. Clonar el repositorio
+
+    git clone https://github.com/64david64/AudioLab.git
+    cd AudioLab
+
+### 2. Crear un entorno virtual
+
+    python -m venv venv
+
+### 3. Activar el entorno virtual
+
+#### En Windows
+
+    venv\Scripts\activate
+
+#### En macOS / Linux
+
+    source venv/bin/activate
+
+### 4. Instalar dependencias
+
+Si actualmente el proyecto solo necesita Flask:
+
+    pip install flask
+
+Si más adelante usas un archivo `requirements.txt`, entonces:
+
+    pip install -r requirements.txt
+
+### 5. Ejecutar la aplicación
 
     python app.py
 
-2. Abrir en navegador:
+### 6. Abrir en el navegador
 
     http://127.0.0.1:5000/
 
----
-
-##  Enfoque conceptual
-
-Este proyecto se basa en la idea de que el sonido puede ser analizado desde múltiples perspectivas:
-
-- como señal temporal (amplitud vs tiempo),
-- como composición frecuencial (FFT),
-- y como fenómeno físico asociado a la percepción auditiva.
-
-La herramienta busca servir como puente entre:
-
-**acústica + procesamiento de señales + visualización + experiencia de usuario**
+> Si en tu archivo `app.py` configuraste otro puerto o modo de ejecución, ajusta la URL según corresponda.
 
 ---
 
-##  Estado del proyecto
+## Mejoras futuras
 
- En desarrollo — versión V1 en construcción
+- FFT optimizada
+- espectrograma
+- sincronización audio–visual
+- análisis multicanal
+- exportación de resultados
+- features espectrales avanzadas
+
+---
+
+## Referencias
+
+Web Audio API  
+https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+
+Fourier  
+https://numpy.org/doc/stable/reference/routines.fft.html
+
+Ventana de Hann  
+https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.hann.html
+
+DSP avanzado  
+https://librosa.org
+
+---
+
+## Estado del proyecto
+
+**Versión:** V1  
+**Estado:** funcional
 
 ---
 
 ##  Autor
 
-Juan David Acosta Rodríguez, Universidad Distrital Francisco José de Caldas,
+Juan David Acosta Rodríguez,
 
-Proyecto desarrollado como parte de un proceso de exploración en:
-
-- procesamiento digital de señales
-- análisis acústico
-- visualización interactiva de datos
+Universidad Distrital Francisco José de Caldas,

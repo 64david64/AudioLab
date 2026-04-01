@@ -3,36 +3,256 @@
 {% block title %}Interpretación | AudioLab{% endblock %}
 
 {% block content %}
+
+<div class="section-card interp-hero-card">
+    <div class="interp-hero-grid">
+        <div>
+            <h2>Guía de interpretación del análisis de audio</h2>
+            <p class="text-emphasis">
+                Esta sección explica cómo leer correctamente los resultados generados por el visor en la pestaña
+                <strong>Análisis</strong>.
+            </p>
+            <p>
+                El objetivo no es producir afirmaciones absolutas sobre una canción, sino ofrecer una lectura
+                estructurada del comportamiento temporal y espectral del fragmento seleccionado.
+            </p>
+        </div>
+
+        <div class="interp-summary-card">
+            <div class="interp-summary-title">Ruta de lectura sugerida</div>
+            <ol class="interp-steps">
+                <li>Observar la forma de onda</li>
+                <li>Leer el espectro de frecuencia</li>
+                <li>Identificar picos dominantes</li>
+                <li>Comparar pico principal y banda predominante</li>
+                <li>Interpretar el resultado con prudencia</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
 <div class="section-card">
-    <h2>Interpretación de resultados</h2>
+    <h3>1. ¿Qué representa la forma de onda?</h3>
+
+    <div class="interp-two-col">
+        <div>
+            <p>
+                La forma de onda muestra cómo cambia la amplitud de la señal a lo largo del tiempo dentro de la
+                ventana seleccionada. Esta vista permite reconocer variaciones de energía, transiciones, ataques
+                y cambios generales en el comportamiento temporal del audio.
+            </p>
+            <p>
+                En esta representación, el eje horizontal corresponde al tiempo y el eje vertical a la amplitud
+                normalizada de la señal visible. Debido al autoescalado implementado en la V1, la forma de onda
+                está optimizada para la lectura local de cada ventana y no para comparaciones absolutas entre
+                fragmentos muy distintos.
+            </p>
+        </div>
+
+        <div class="interp-visual-card">
+            <div class="interp-visual-title">Lectura rápida</div>
+            <div class="interp-wave-demo">
+                <div class="interp-wave-axis interp-wave-axis-x"></div>
+                <div class="interp-wave-axis interp-wave-axis-y"></div>
+                <div class="interp-wave-line"></div>
+            </div>
+            <div class="interp-bullets">
+                <div class="interp-bullet">Mayor amplitud visible → más variación local</div>
+                <div class="interp-bullet">Cambios bruscos → ataques o transiciones</div>
+                <div class="interp-bullet">Patrones repetitivos → posible regularidad temporal</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>2. ¿Qué representa el espectro de frecuencia?</h3>
+
+    <div class="interp-two-col">
+        <div>
+            <p>
+                El espectro muestra qué frecuencias componen la señal y con qué magnitud relativa participan
+                dentro de la ventana seleccionada.
+            </p>
+            <p>
+                En el eje horizontal se representan las frecuencias en hertz (Hz): hacia la izquierda se ubican
+                las frecuencias bajas y hacia la derecha las altas. El eje vertical representa la magnitud relativa
+                estimada por la DFT para cada componente frecuencial.
+            </p>
+        </div>
+
+        <div class="interp-spectrum-card">
+            <div class="interp-spectrum-title">Lectura del espectro</div>
+            <div class="interp-spectrum-demo">
+                <div class="interp-band low">Graves</div>
+                <div class="interp-band mid">Medios</div>
+                <div class="interp-band high">Agudos</div>
+
+                <div class="interp-peak p1"></div>
+                <div class="interp-peak p2"></div>
+                <div class="interp-peak p3 main"></div>
+                <div class="interp-peak p4"></div>
+            </div>
+            <p class="interp-mini-note">
+                La posición indica la frecuencia y la altura relativa indica su magnitud.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>3. ¿Qué significan los picos dominantes?</h3>
+
     <p>
-        Esta sección servirá para acompañar la lectura de las gráficas
-        y ayudar a comprender qué puede observarse en cada representación.
+        Los picos dominantes corresponden a frecuencias que sobresalen localmente dentro del espectro y cumplen
+        criterios de detección definidos por el visor: máximo local, umbral relativo de magnitud y separación mínima
+        entre frecuencias cercanas.
+    </p>
+
+    <div class="interp-card-grid">
+        <div class="interp-mini-card">
+            <h4>Picos secundarios</h4>
+            <p>
+                Son frecuencias relevantes dentro del espectro, pero no necesariamente la más intensa.
+                Aportan contexto sobre la estructura espectral del fragmento.
+            </p>
+        </div>
+
+        <div class="interp-mini-card highlight">
+            <h4>Pico principal</h4>
+            <p>
+                Es el pico de mayor magnitud relativa entre los detectados. Representa el componente individual
+                más intenso de la ventana analizada.
+            </p>
+        </div>
+    </div>
+
+    <p>
+        En la V1, cada pico también se convierte a una nota musical aproximada. Esta conversión es una ayuda
+        interpretativa y no debe entenderse como una transcripción musical completa ni exacta del fragmento.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Lectura de la forma de onda</h3>
+    <h3>4. Banda predominante vs. pico principal</h3>
+
+    <div class="interp-contrast-box">
+        <div class="interp-contrast-side">
+            <h4>Pico principal</h4>
+            <p>Describe una frecuencia puntual que sobresale por encima de las demás.</p>
+        </div>
+
+        <div class="interp-contrast-vs">≠</div>
+
+        <div class="interp-contrast-side">
+            <h4>Banda predominante</h4>
+            <p>Resume la distribución global de energía entre graves, medios y agudos.</p>
+        </div>
+    </div>
+
     <p>
-        La gráfica temporal permite observar variaciones de amplitud,
-        cambios de dinámica y posibles contrastes entre fragmentos.
+        Estas dos lecturas no tienen por qué coincidir. Es posible que una frecuencia aislada en graves sea el pico
+        más intenso, mientras que la mayor parte del contenido relevante esté distribuida en medios. Por eso el visor
+        interpreta ambas dimensiones por separado.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Lectura de la FFT</h3>
+    <h3>5. ¿Cómo leer graves, medios y agudos?</h3>
+
+    <div class="interp-card-grid thirds">
+        <div class="interp-mini-card low-accent">
+            <h4>Graves</h4>
+            <p>
+                Corresponden a la región baja del espectro. Cuando predominan, la lectura suele asociarse con peso,
+                base o profundidad sonora.
+            </p>
+        </div>
+
+        <div class="interp-mini-card mid-accent">
+            <h4>Medios</h4>
+            <p>
+                Corresponden a la zona intermedia del espectro. Su predominio suele indicar concentración de contenido
+                melódico o de componentes importantes para la inteligibilidad sonora.
+            </p>
+        </div>
+
+        <div class="interp-mini-card high-accent">
+            <h4>Agudos</h4>
+            <p>
+                Representan la región alta del espectro. Cuando predominan, suelen asociarse con brillo, detalle
+                y presencia de componentes de mayor contenido armónico alto.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>6. ¿Cómo se construye la interpretación automática?</h3>
+
     <p>
-        La gráfica en frecuencia permite identificar componentes dominantes
-        y analizar cómo se distribuye el contenido espectral de la señal.
+        La interpretación automática del visor se basa en reglas simples y controladas. A partir de los picos detectados,
+        el sistema:
+    </p>
+
+    <div class="interp-pipeline">
+        <div class="interp-pipeline-step">Detecta picos</div>
+        <div class="interp-pipeline-arrow">→</div>
+        <div class="interp-pipeline-step">Clasifica por bandas</div>
+        <div class="interp-pipeline-arrow">→</div>
+        <div class="interp-pipeline-step">Compara distribuciones</div>
+        <div class="interp-pipeline-arrow">→</div>
+        <div class="interp-pipeline-step">Genera texto interpretativo</div>
+    </div>
+
+    <p>
+        El resultado combina varios criterios: banda dominante, grado de concentración del contenido, relación
+        entre el pico principal y la distribución global, y manejo prudente de casos límite como ventanas con
+        pocos picos o distribuciones demasiado homogéneas.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Alcance interpretativo</h3>
+    <h3>7. ¿Qué sí puede afirmar el visor?</h3>
+
+    <div class="interp-card-grid two-cols">
+        <div class="interp-mini-card okay">
+            <h4>Lo que sí puede hacer</h4>
+            <ul>
+                <li>Mostrar la estructura temporal y frecuencial de una ventana de audio.</li>
+                <li>Identificar picos relevantes y resumir su distribución por bandas.</li>
+                <li>Proporcionar una lectura interpretativa básica y prudente.</li>
+            </ul>
+        </div>
+
+        <div class="interp-mini-card caution">
+            <h4>Lo que no pretende hacer</h4>
+            <ul>
+                <li>Identificar instrumentos de forma automática y concluyente.</li>
+                <li>Determinar emociones de la canción como verdad absoluta.</li>
+                <li>Reemplazar herramientas avanzadas de análisis acústico o musicológico.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>8. ¿Cómo usar esta lectura junto con la pestaña Análisis?</h3>
     <p>
-        Las gráficas ofrecen pistas útiles sobre el comportamiento del audio,
-        pero su interpretación debe hacerse con cuidado y dentro del contexto
-        musical y acústico del fragmento analizado.
+        La forma recomendada de uso es comparar varios fragmentos de una misma pieza. Al desplazarte por el audio,
+        puedes observar cómo cambian simultáneamente:
+    </p>
+    <ul>
+        <li>la forma de onda visible,</li>
+        <li>la distribución del espectro,</li>
+        <li>los picos dominantes,</li>
+        <li>la banda predominante,</li>
+        <li>y la interpretación automática resultante.</li>
+    </ul>
+    <p>
+        De este modo, el visor permite estudiar no solo un resultado aislado, sino la evolución del contenido sonoro
+        a lo largo del tiempo.
     </p>
 </div>
+
 {% endblock %}

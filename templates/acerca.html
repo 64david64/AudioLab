@@ -1,32 +1,268 @@
 {% extends "base.html" %}
 
-{% block title %}Acerca del proyecto | AudioLab{% endblock %}
+{% block title %}Acerca | AudioLab{% endblock %}
 
 {% block content %}
+
+<div class="section-card about-hero-card">
+    <div class="about-hero-grid">
+        <div>
+            <h2>Acerca del proyecto</h2>
+            <p class="text-emphasis">
+                AudioLab es un visor web local orientado a la exploración visual e interpretativa de señales de audio.
+            </p>
+            <p>
+                Su propósito es articular conceptos de física de ondas, acústica y procesamiento digital de señales
+                en una experiencia interactiva que permita observar cómo cambia el contenido temporal y frecuencial
+                de un fragmento sonoro.
+            </p>
+            <p>
+                Más que desarrollar algoritmos nuevos, el proyecto se centra en una pregunta de producto:
+                <strong>¿cómo traducir un análisis técnico a una lectura comprensible, visual y pedagógica?</strong>
+            </p>
+        </div>
+
+        <div class="about-highlight-card">
+            <div class="about-highlight-title">Enfoque de la V1</div>
+            <ul class="about-highlight-list">
+                <li>Visualización del audio en tiempo y frecuencia</li>
+                <li>Exploración local por ventanas temporales</li>
+                <li>Detección de picos dominantes</li>
+                <li>Interpretación automática básica y prudente</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 <div class="section-card">
-    <h2>Acerca del proyecto</h2>
+    <h3>1. Propósito general</h3>
     <p>
-        Este proyecto busca construir un visor web local de análisis de audio
-        con fines didácticos, exploratorios y visuales.
+        Este proyecto fue concebido como una herramienta de apoyo para la comprensión del sonido desde una perspectiva
+        técnico-visual. La meta de esta primera versión no es competir con software especializado de análisis acústico,
+        sino ofrecer una base clara para examinar una señal, identificar patrones frecuenciales relevantes y comunicar
+        esos hallazgos en un lenguaje más accesible.
+    </p>
+    <p>
+        En ese sentido, AudioLab se sitúa entre dos dimensiones: por un lado, la representación cuantitativa de una
+        señal digital; por otro, su traducción a una lectura interpretativa que oriente al usuario sin exceder lo que
+        los datos realmente permiten afirmar.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Objetivo de la V1</h3>
+    <h3>2. Caso de estudio</h3>
+    <div class="about-two-col">
+        <div>
+            <p>
+                Como referencia de exploración se utiliza la canción
+                <strong>“A Day in the Life” — The Beatles</strong>.
+            </p>
+            <p>
+                La elección de este caso de estudio responde a su utilidad para observar cambios de densidad,
+                contrastes entre secciones y variación del contenido espectral a lo largo del tiempo. El propósito
+                no es realizar un análisis musicológico exhaustivo de la obra, sino usarla como material de prueba
+                para examinar el comportamiento del visor frente a fragmentos con características sonoras distintas.
+            </p>
+        </div>
+
+        <div class="about-mini-panel">
+            <h4>Uso del caso de estudio</h4>
+            <ul>
+                <li>Explorar cambios de contenido frecuencial entre fragmentos</li>
+                <li>Comparar ventanas con distinta densidad espectral</li>
+                <li>Validar la lectura de picos y bandas predominantes</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>3. Decisiones metodológicas de la V1</h3>
+
+    <div class="about-method-grid">
+        <div class="about-method-card">
+            <h4>Procesamiento en navegador</h4>
+            <p>
+                El proyecto utiliza <strong>Web Audio API</strong> para decodificar audio y trabajar con buffers
+                directamente en el navegador, evitando depender de un backend de procesamiento para esta etapa.
+            </p>
+        </div>
+
+        <div class="about-method-card">
+            <h4>Análisis sobre un solo canal</h4>
+            <p>
+                La V1 realiza el análisis sobre el canal 0 como simplificación metodológica. Esta decisión reduce
+                complejidad y es suficiente para una primera lectura visual e interpretativa.
+            </p>
+        </div>
+
+        <div class="about-method-card">
+            <h4>DFT manual</h4>
+            <p>
+                En lugar de una FFT optimizada, esta versión implementa una DFT manual con fines didácticos.
+                La prioridad no es la máxima eficiencia computacional, sino la claridad conceptual del proceso.
+            </p>
+        </div>
+
+        <div class="about-method-card">
+            <h4>Ventana de Hann</h4>
+            <p>
+                Antes del cálculo espectral se aplica una ventana de Hann para reducir discontinuidades en los
+                extremos del fragmento seleccionado y mejorar la lectura del espectro resultante.
+            </p>
+        </div>
+
+        <div class="about-method-card">
+            <h4>Interpretación basada en reglas</h4>
+            <p>
+                La interpretación automática no usa modelos de aprendizaje automático. Se apoya en reglas controladas
+                a partir de picos dominantes, distribución por bandas y manejo prudente de casos límite.
+            </p>
+        </div>
+
+        <div class="about-method-card">
+            <h4>Enfoque de producto</h4>
+            <p>
+                El valor principal del visor está en cómo organiza la visualización, la explicación y la interacción
+                del usuario con la señal, más que en reinventar técnicas de análisis ya conocidas.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>4. Alcances de esta versión</h3>
+
+    <div class="about-limits-grid">
+        <div class="about-limit-card okay">
+            <h4>Lo que sí hace la V1</h4>
+            <ul>
+                <li>Carga y decodifica audio local en navegador</li>
+                <li>Visualiza forma de onda y espectro</li>
+                <li>Permite navegación temporal por ventanas</li>
+                <li>Detecta picos dominantes</li>
+                <li>Resume la distribución entre graves, medios y agudos</li>
+                <li>Genera una interpretación automática básica</li>
+            </ul>
+        </div>
+
+        <div class="about-limit-card caution">
+            <h4>Lo que no busca resolver</h4>
+            <ul>
+                <li>Identificación automática de instrumentos</li>
+                <li>Clasificación emocional concluyente de canciones</li>
+                <li>Análisis musicológico exhaustivo</li>
+                <li>Procesamiento multicanal avanzado</li>
+                <li>Espectrograma o extracción compleja de features</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="section-card">
+    <h3>5. Limitaciones reconocidas</h3>
     <p>
-        Desarrollar una primera versión funcional que permita cargar un archivo,
-        visualizar su forma de onda y su contenido frecuencial, y presentar
-        una experiencia clara para el usuario.
+        La interpretación del visor depende de la ventana temporal seleccionada y de la estructura local del fragmento
+        analizado. En consecuencia, los resultados deben leerse como una descripción localizada del comportamiento
+        espectral, no como una caracterización total e inmutable de toda la canción.
+    </p>
+    <p>
+        Además, la conversión de picos a notas musicales tiene un propósito orientativo y no sustituye procesos de
+        transcripción musical. Del mismo modo, la clasificación en graves, medios y agudos constituye una simplificación
+        útil para la V1, pero no agota la complejidad real del fenómeno sonoro.
     </p>
 </div>
 
 <div class="section-card">
-    <h3>Qué se dejará para una V2</h3>
-    <ul>
-        <li>Espectrograma.</li>
-        <li>Selección de fragmentos específicos.</li>
-        <li>Controles avanzados de análisis.</li>
-        <li>Métricas adicionales y comparaciones.</li>
-    </ul>
+    <h3>6. Bibliografía y recursos útiles</h3>
+    <p>
+        Las siguientes referencias respaldan la base técnica y conceptual utilizada en el proyecto, y sirven también
+        como punto de partida para futuras ampliaciones del visor.
+    </p>
+
+    <div class="about-ref-grid">
+        <div class="about-ref-card">
+            <h4>Web Audio API (MDN)</h4>
+            <p>
+                Documentación general de la API usada para trabajar con audio en navegador, visualización y flujo
+                de procesamiento.
+            </p>
+            <a class="about-ref-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>Using the Web Audio API (MDN)</h4>
+            <p>
+                Guía práctica sobre el uso del contexto de audio, nodos y arquitectura general de procesamiento.
+            </p>
+            <a class="about-ref-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>Basic concepts behind Web Audio API (MDN)</h4>
+            <p>
+                Explicación conceptual del modelo de audio graph y de la lógica general detrás de la API.
+            </p>
+            <a class="about-ref-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>Discrete Fourier Transform (NumPy)</h4>
+            <p>
+                Referencia conceptual sobre análisis de Fourier y formulación discreta del problema.
+            </p>
+            <a class="about-ref-link" href="https://numpy.org/devdocs/reference/routines.fft.html" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>numpy.fft.fft (NumPy)</h4>
+            <p>
+                Documentación sobre el cálculo eficiente del DFT mediante FFT, útil como referencia comparativa
+                frente a la DFT manual empleada en la V1.
+            </p>
+            <a class="about-ref-link" href="https://numpy.org/doc/stable/reference/generated/numpy.fft.fft.html" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>Hann window (SciPy)</h4>
+            <p>
+                Definición formal de la ventana de Hann y su uso como ventana de atenuación con extremos en cero.
+            </p>
+            <a class="about-ref-link" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.windows.hann.html" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>Window functions (SciPy)</h4>
+            <p>
+                Panorama general de funciones ventana empleadas en procesamiento de señales.
+            </p>
+            <a class="about-ref-link" href="https://docs.scipy.org/doc/scipy/reference/signal.windows.html" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+
+        <div class="about-ref-card">
+            <h4>librosa – spectral features</h4>
+            <p>
+                Referencia útil para ampliar en el futuro el visor hacia descriptores espectrales y análisis más avanzados.
+            </p>
+            <a class="about-ref-link" href="https://librosa.org/doc/0.11.0/_modules/librosa/feature/spectral.html" target="_blank" rel="noopener noreferrer">
+                Abrir referencia
+            </a>
+        </div>
+    </div>
 </div>
+
 {% endblock %}
