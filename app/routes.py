@@ -1,22 +1,19 @@
-from flask import Flask, render_template
+from flask import Blueprint, render_template
 
-app = Flask(__name__)
+main = Blueprint("main", __name__)
 
-@app.route("/")
+@main.route("/")
 def inicio():
     return render_template("inicio.html", active_page="inicio")
 
-@app.route("/analisis")
+@main.route("/analisis")
 def analisis():
     return render_template("analisis.html", active_page="analisis")
 
-@app.route("/interpretacion")
+@main.route("/interpretacion")
 def interpretacion():
     return render_template("interpretacion.html", active_page="interpretacion")
 
-@app.route("/acerca")
+@main.route("/acerca")
 def acerca():
     return render_template("acerca.html", active_page="acerca")
-
-if __name__ == "__main__":
-    app.run(debug=True)

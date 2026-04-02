@@ -37,21 +37,31 @@ Construir una herramienta web local que permita:
 
     AudioLab/
     │
-    ├── app.py
-    ├── templates/
-    │   ├── base.html
-    │   ├── inicio.html
-    │   ├── analisis.html
-    │   ├── interpretacion.html
-    │   └── acerca.html
+    ├── run.py
+    ├── config.py
+    ├── requirements.txt
+    ├── README.md
     │
-    ├── static/
-    │   ├── css/
-    │   │   └── styles.css
-    │   └── js/
-    │       └── script.js
-    │
-    └── README.md
+    ├── app/
+    │   ├── __init__.py
+    │   ├── routes.py
+    │   │
+    │   ├── templates/
+    │   │   ├── base.html
+    │   │   ├── inicio.html
+    │   │   ├── analisis.html
+    │   │   ├── interpretacion.html
+    │   │   └── acerca.html
+    │   │
+    │   └── static/
+    │       ├── css/
+    │       │   └── styles.css
+    │       │
+    │       └── js/
+    │           ├── main.js
+    │           ├── analysis.js
+    │           ├── interpretation-ui.js
+    │           └── audio-utils.js
 
 ---
 
@@ -297,23 +307,19 @@ Colores por bandas:
 
 ### 4. Instalar dependencias
 
-Si actualmente el proyecto solo necesita Flask:
-
-    pip install flask
-
-Si más adelante usas un archivo `requirements.txt`, entonces:
-
     pip install -r requirements.txt
+
+---
 
 ### 5. Ejecutar la aplicación
 
-    python app.py
+    python run.py
+
+---
 
 ### 6. Abrir en el navegador
 
     http://127.0.0.1:5000/
-
-> Si en tu archivo `app.py` configuraste otro puerto o modo de ejecución, ajusta la URL según corresponda.
 
 ---
 
@@ -351,8 +357,7 @@ https://librosa.org
 
 ---
 
-##  Autor
+## Autor
 
-Juan David Acosta Rodríguez,
-
-Universidad Distrital Francisco José de Caldas,
+Juan David Acosta Rodríguez  
+Universidad Distrital Francisco José de Caldas
