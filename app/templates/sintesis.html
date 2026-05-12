@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Síntesis sonora | AudioLab{% endblock %}
+
+{% block content %}
+<section class="section-card page-hero synthesis-hero">
+    <div class="page-hero-grid">
+        <div>
+            <span class="page-kicker">Módulo de síntesis</span>
+            <h2>Construcción visual y auditiva de ondas sonoras</h2>
+            <p class="page-lead">
+                Genera ondas simples o suma componentes armónicas, escucha la señal resultante y compártela con Análisis o Simulación acústica para continuar el flujo del laboratorio.
+            </p>
+        </div>
+
+        <aside class="hero-support-card">
+            <h3>Qué aprenderás aquí</h3>
+            <ul>
+                <li>Una onda senoidal concentra su energía en una frecuencia principal.</li>
+                <li>Las ondas cuadrada, triangular y diente de sierra agregan armónicos.</li>
+                <li>La suma de ondas permite construir señales más complejas y modificar el timbre.</li>
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<section class="section-card synthesis-lab-card">
+    <div class="synthesis-lab-layout">
+        <aside class="synthesis-control-panel">
+            <div class="simulation-card-header">
+                <div>
+                    <span class="simulation-step-label">Fuente</span>
+                    <h3>Generador de ondas</h3>
+                </div>
+            </div>
+
+            <p class="helper-text">
+                Ajusta la señal y presiona reproducir. Luego puedes compartir la señal generada para analizarla como si fuera un audio cargado.
+            </p>
+
+            <div class="preset-row synth-preset-row" aria-label="Presets de síntesis">
+                <button type="button" class="preset-chip" data-synth-preset="pure-a4">Tono puro 440 Hz</button>
+                <button type="button" class="preset-chip" data-synth-preset="deep-sine">Seno grave</button>
+                <button type="button" class="preset-chip" data-synth-preset="rich-square">Armónicos impares</button>
+                <button type="button" class="preset-chip" data-synth-preset="bright-additive">Suma brillante</button>
+            </div>
+
+            <div class="control-group full-width-control">
+                <label for="synth-wave-type">Tipo de onda</label>
+                <select id="synth-wave-type">
+                    <option value="sine">Senoidal</option>
+                    <option value="square">Cuadrada</option>
+                    <option value="triangle">Triangular</option>
+                    <option value="sawtooth">Diente de sierra</option>
+                    <option value="additive">Suma de ondas</option>
+                </select>
+            </div>
+
+            <div class="slider-control-block">
+                <div class="slider-label-row">
+                    <label for="synth-frequency">Frecuencia fundamental</label>
+                    <strong id="synth-frequency-output">440 Hz</strong>
+                </div>
+                <input type="range" id="synth-frequency" min="80" max="2000" step="1" value="440">
+                <div class="range-hints">
+                    <span>grave</span>
+                    <span>agudo</span>
+                </div>
+            </div>
+
+            <div class="slider-control-block">
+                <div class="slider-label-row">
+                    <label for="synth-amplitude">Amplitud / intensidad</label>
+                    <strong id="synth-amplitude-output">50%</strong>
+                </div>
+                <input type="range" id="synth-amplitude" min="0" max="100" step="1" value="50">
+                <div class="range-hints">
+                    <span>suave</span>
+                    <span>intenso</span>
+                </div>
+            </div>
+
+            <div id="additive-controls" class="additive-controls" aria-label="Controles de suma de ondas">
+                <h4>Suma de componentes</h4>
+                <p class="helper-text compact-helper">
+                    La fundamental siempre está activa. Ajusta cuánto aportan el segundo y tercer armónico.
+                </p>
+
+                <div class="slider-control-block compact-slider">
+                    <div class="slider-label-row">
+                        <label for="synth-harmonic-2">2.º armónico</label>
+                        <strong id="synth-harmonic-2-output">35%</strong>
+                    </div>
+                    <input type="range" id="synth-harmonic-2" min="0" max="100" step="1" value="35">
+                </div>
+
+                <div class="slider-control-block compact-slider">
+                    <div class="slider-label-row">
+                        <label for="synth-harmonic-3">3.º armónico</label>
+                        <strong id="synth-harmonic-3-output">20%</strong>
+                    </div>
+                    <input type="range" id="synth-harmonic-3" min="0" max="100" step="1" value="20">
+                </div>
+            </div>
+
+            <div class="control-group full-width-control">
+                <label for="synth-duration">Duración de reproducción</label>
+                <select id="synth-duration">
+                    <option value="1.5">1.5 segundos</option>
+                    <option value="3" selected>3 segundos</option>
+                    <option value="5">5 segundos</option>
+                    <option value="continuous">Continuo hasta detener</option>
+                </select>
+            </div>
+
+            <div class="synthesis-button-row">
+                <button type="button" class="primary-btn" id="synth-play-btn">Reproducir</button>
+                <button type="button" class="secondary-btn" id="synth-stop-btn">Detener</button>
+            </div>
+
+            <div class="synthesis-button-row share-row">
+                <button type="button" class="secondary-btn" id="synth-share-analysis-btn">Compartir con Análisis</button>
+                <button type="button" class="secondary-btn" id="synth-share-simulation-btn">Compartir con Simulación</button>
+            </div>
+
+            <div id="synth-status" class="analysis-quality-message info">
+                Selecciona una onda y reproduce la señal para escucharla.
+            </div>
+        </aside>
+
+        <div class="synthesis-visual-panel">
+            <div class="synthesis-plot-grid">
+                <article class="synthesis-plot-card">
+                    <div class="simulation-card-header">
+                        <div>
+                            <span class="simulation-step-label">Tiempo</span>
+                            <h3>Forma de onda generada</h3>
+                        </div>
+                    </div>
+                    <p class="helper-text">
+                        Muestra la oscilación de la señal. En modo suma, la forma resultante nace de combinar varias componentes senoidales.
+                    </p>
+                    <canvas id="synth-waveform-canvas" class="plot-canvas synth-canvas"></canvas>
+                </article>
+
+                <article class="synthesis-plot-card">
+                    <div class="simulation-card-header">
+                        <div>
+                            <span class="simulation-step-label">Frecuencia</span>
+                            <h3>Espectro armónico</h3>
+                        </div>
+                    </div>
+                    <p class="helper-text">
+                        Representación conceptual de los armónicos principales. No es luz real: el color es un código visual para facilitar la lectura.
+                    </p>
+                    <canvas id="synth-spectrum-canvas" class="plot-canvas synth-canvas"></canvas>
+                </article>
+            </div>
+
+            <div class="synthesis-interpretation-grid">
+                <article class="reading-guide-card synthesis-reading-card">
+                    <span>Observación técnica</span>
+                    <p id="synth-technical-output">La onda senoidal concentra la señal en una frecuencia fundamental.</p>
+                </article>
+
+                <article class="reading-guide-card synthesis-reading-card">
+                    <span>Lectura perceptual</span>
+                    <p id="synth-perception-output">A mayor frecuencia, el sonido se percibe más agudo; a mayor amplitud, se percibe más intenso.</p>
+                </article>
+
+                <article class="reading-guide-card synthesis-reading-card caution">
+                    <span>Precaución</span>
+                    <p id="synth-caution-output">La visualización usa un modelo ideal. Los sonidos reales pueden tener ruido, envolvente y variaciones temporales.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-card synthesis-concept-card">
+    <h3>Flujo dentro del laboratorio</h3>
+    <p>
+        La señal generada puede guardarse temporalmente en el navegador. Luego puedes cargarla desde Análisis para ver su DFT y espectrograma, o usarla como fuente sonora dentro de la simulación Doppler.
+    </p>
+</section>
+{% endblock %}

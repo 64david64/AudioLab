@@ -9,10 +9,10 @@
         <div>
             <h2>Acerca del proyecto</h2>
             <p class="text-emphasis">
-                AudioLab es un visor web local orientado a la exploración visual e interpretativa de señales de audio.
+                AudioLab es un visor web local orientado a la exploración visual e interpretativa de fenómenos ondulatorios, con énfasis principal en audio y una extensión conceptual hacia óptica.
             </p>
             <p>
-                Su propósito es articular conceptos de física de ondas, acústica y procesamiento digital de señales
+                Su propósito es articular conceptos de física de ondas, acústica, procesamiento digital de señales y óptica básica
                 en una experiencia interactiva que permita observar cómo cambia el contenido temporal y frecuencial
                 de un fragmento sonoro.
             </p>
@@ -23,11 +23,12 @@
         </div>
 
         <div class="about-highlight-card">
-            <div class="about-highlight-title">Enfoque de la V1</div>
+            <div class="about-highlight-title">Enfoque de la V3.0</div>
             <ul class="about-highlight-list">
-                <li>Visualización del audio en tiempo y frecuencia</li>
-                <li>Exploración local por ventanas temporales</li>
-                <li>Detección de picos dominantes</li>
+                <li>Síntesis de ondas básicas, suma de armónicos y lectura espectral</li>
+                <li>Visualización del audio en tiempo, frecuencia y tiempo-frecuencia</li>
+                <li>Simulación Doppler dinámica con audio y espectro conceptual</li>
+                <li>Óptica básica: reflexión, refracción y difracción</li>
                 <li>Interpretación automática básica y prudente</li>
             </ul>
         </div>
@@ -38,7 +39,7 @@
     <h3>1. Propósito general</h3>
     <p>
         Este proyecto fue concebido como una herramienta de apoyo para la comprensión del sonido desde una perspectiva
-        técnico-visual. La meta de esta primera versión no es competir con software especializado de análisis acústico,
+        técnico-visual. La meta de esta versión no es competir con software especializado de análisis acústico,
         sino ofrecer una base clara para examinar una señal, identificar patrones frecuenciales relevantes y comunicar
         esos hallazgos en un lenguaje más accesible.
     </p>
@@ -77,7 +78,7 @@
 </div>
 
 <div class="section-card">
-    <h3>3. Decisiones metodológicas de la V1</h3>
+    <h3>3. Decisiones metodológicas de la versión actual</h3>
 
     <div class="about-method-grid">
         <div class="about-method-card">
@@ -91,7 +92,7 @@
         <div class="about-method-card">
             <h4>Análisis sobre un solo canal</h4>
             <p>
-                La V1 realiza el análisis sobre el canal 0 como simplificación metodológica. Esta decisión reduce
+                La versión actual realiza el análisis sobre el canal 0 como simplificación metodológica. Esta decisión reduce
                 complejidad y es suficiente para una primera lectura visual e interpretativa.
             </p>
         </div>
@@ -135,14 +136,16 @@
 
     <div class="about-limits-grid">
         <div class="about-limit-card okay">
-            <h4>Lo que sí hace la V1</h4>
+            <h4>Lo que sí hace AudioLab</h4>
             <ul>
                 <li>Carga y decodifica audio local en navegador</li>
-                <li>Visualiza forma de onda y espectro</li>
+                <li>Genera ondas básicas, suma armónicos y comparte señales entre módulos</li>
+                <li>Visualiza forma de onda, espectro y espectrograma</li>
                 <li>Permite navegación temporal por ventanas</li>
-                <li>Detecta picos dominantes</li>
-                <li>Resume la distribución entre graves, medios y agudos</li>
-                <li>Genera una interpretación automática básica</li>
+                <li>Detecta picos dominantes y estima energía por bandas</li>
+                <li>Simula el efecto Doppler con visualización dinámica</li>
+                <li>Incluye un simulador conceptual de óptica básica</li>
+                <li>Genera interpretaciones automáticas básicas</li>
             </ul>
         </div>
 
@@ -153,7 +156,8 @@
                 <li>Clasificación emocional concluyente de canciones</li>
                 <li>Análisis musicológico exhaustivo</li>
                 <li>Procesamiento multicanal avanzado</li>
-                <li>Espectrograma o extracción compleja de features</li>
+                <li>Extracción compleja de features o reconocimiento automático</li>
+                <li>Simulación óptica avanzada con polarización, interferometría o geometrías complejas</li>
             </ul>
         </div>
     </div>
@@ -169,7 +173,7 @@
     <p>
         Además, la conversión de picos a notas musicales tiene un propósito orientativo y no sustituye procesos de
         transcripción musical. Del mismo modo, la clasificación en graves, medios y agudos constituye una simplificación
-        útil para la V1, pero no agota la complejidad real del fenómeno sonoro.
+        útil para una lectura inicial, pero no agota la complejidad real del fenómeno sonoro.
     </p>
 </div>
 
@@ -226,7 +230,7 @@
             <h4>numpy.fft.fft (NumPy)</h4>
             <p>
                 Documentación sobre el cálculo eficiente del DFT mediante FFT, útil como referencia comparativa
-                frente a la DFT manual empleada en la V1.
+                frente a la DFT manual empleada en esta versión.
             </p>
             <a class="about-ref-link" href="https://numpy.org/doc/stable/reference/generated/numpy.fft.fft.html" target="_blank" rel="noopener noreferrer">
                 Abrir referencia

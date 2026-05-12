@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AudioLab{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
-
     <header class="topbar">
         <div class="brand">
             <h1>AudioLab</h1>
-            <p>Visor local de análisis de audio</p>
+            <p>Visualización, análisis e interpretación pedagógica del sonido</p>
         </div>
 
-        <nav class="nav-tabs">
+        <nav class="nav-tabs" aria-label="Navegación principal">
             <a href="{{ url_for('main.inicio') }}" class="tab-link {% if active_page == 'inicio' %}active{% endif %}">Inicio</a>
+            <a href="{{ url_for('main.sintesis') }}" class="tab-link {% if active_page == 'sintesis' %}active{% endif %}">Síntesis sonora</a>
             <a href="{{ url_for('main.analisis') }}" class="tab-link {% if active_page == 'analisis' %}active{% endif %}">Análisis</a>
             <a href="{{ url_for('main.interpretacion') }}" class="tab-link {% if active_page == 'interpretacion' %}active{% endif %}">Interpretación</a>
-            <a href="{{ url_for('main.acerca') }}" class="tab-link {% if active_page == 'acerca' %}active{% endif %}">Acerca del proyecto</a>
+            <a href="{{ url_for('main.simulacion') }}" class="tab-link {% if active_page == 'simulacion' %}active{% endif %}">Simulación acústica</a>
+            <a href="{{ url_for('main.optica') }}" class="tab-link {% if active_page == 'optica' %}active{% endif %}">Óptica</a>
+            <a href="{{ url_for('main.acerca') }}" class="tab-link {% if active_page == 'acerca' %}active{% endif %}">Acerca</a>
         </nav>
     </header>
 

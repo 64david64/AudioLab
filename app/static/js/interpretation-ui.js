@@ -1,28 +1,46 @@
 import { frequencyToNote, formatMagnitude, formatPercentage } from "./audio-utils.js";
 
-export function classifyFrequencyBands(peaks) {
-    const bands = {
+const LOW_MAX_HZ = 250;
+const MID_MAX_HZ = 2000;
+
+export function getBandKey(freq) {
+    if (freq < LOW_MAX_HZ) return "low";
+    if (freq < MID_MAX_HZ) return "mid";
+    return "high";
+}
+
+export function getBandLabel(key) {
+    const labels = {
+        low: "graves",
+        mid: "medios",
+        high: "agudos"
+    };
+
+    return labels[key] || "medios";
+}
+
+export function createEmptyBands() {
+    return {
         low: { count: 0, energy: 0 },
         mid: { count: 0, energy: 0 },
         high: { count: 0, energy: 0 }
     };
+}
 
-    if (!peaks || peaks.length === 0) return bands;
+export function classifyFrequencyBands(points, options = {}) {
+    const { usePower = false } = options;
+    const bands = createEmptyBands();
 
-    peaks.forEach((peak) => {
-        const f = peak.freq;
-        const mag = peak.mag;
+    if (!points || points.length === 0) return bands;
 
-        if (f < 250) {
-            bands.low.count += 1;
-            bands.low.energy += mag;
-        } else if (f < 2000) {
-            bands.mid.count += 1;
-            bands.mid.energy += mag;
-        } else {
-            bands.high.count += 1;
-            bands.high.energy += mag;
-        }
+    points.forEach((point) => {
+        if (!point || !Number.isFinite(point.freq) || !Number.isFinite(point.mag)) return;
+
+        const key = getBandKey(point.freq);
+        const contribution = usePower ? point.mag * point.mag : point.mag;
+
+        bands[key].count += 1;
+        bands[key].energy += contribution;
     });
 
     return bands;
@@ -43,15 +61,19 @@ export function normalizeBands(bands) {
 }
 
 export function getDominantBandKey(normalized) {
-    let dominantBand = "mid";
+    const values = [
+        { key: "low", value: normalized.low },
+        { key: "mid", value: normalized.mid },
+        { key: "high", value: normalized.high }
+    ];
 
-    if (normalized.low > normalized.mid && normalized.low > normalized.high) {
-        dominantBand = "low";
-    } else if (normalized.high > normalized.mid && normalized.high > normalized.low) {
-        dominantBand = "high";
-    }
+    values.sort((a, b) => b.value - a.value);
+    return values[0].value > 0 ? values[0].key : null;
+}
 
-    return dominantBand;
+export function getMainPeak(peaks) {
+    if (!peaks || peaks.length === 0) return null;
+    return [...peaks].sort((a, b) => b.mag - a.mag)[0];
 }
 
 export function renderDominantPeaks(container, peaks) {
@@ -62,7 +84,7 @@ export function renderDominantPeaks(container, peaks) {
         return;
     }
 
-    const mainPeak = [...peaks].sort((a, b) => b.mag - a.mag)[0];
+    const mainPeak = getMainPeak(peaks);
 
     container.innerHTML = peaks.map(peak => {
         const isMainPeak = peak === mainPeak;
@@ -104,12 +126,14 @@ export function buildInterpretationText(normalized, peaks) {
         return "No hay suficientes picos detectados para generar una interpretación.";
     }
 
-    if (peaks.length <= 2) {
-        const mainPeak = peaks[0];
-        const freq = Math.round(mainPeak.freq);
-        const note = frequencyToNote(mainPeak.freq);
+    const mainPeak = getMainPeak(peaks);
+    const mainPeakFreq = Math.round(mainPeak.freq);
+    const mainPeakNote = frequencyToNote(mainPeak.freq);
+    const mainPeakBand = getBandKey(mainPeak.freq);
+    const mainPeakBandLabel = getBandLabel(mainPeakBand);
 
-        return `Se detectan muy pocos componentes dominantes en esta ventana, lo que sugiere una señal simple o poco compleja. El componente principal se encuentra alrededor de ${freq} Hz (${note}).`;
+    if (peaks.length <= 2) {
+        return `Se detectan muy pocos componentes dominantes en esta ventana, lo que sugiere una señal simple o poco compleja. El componente principal se encuentra alrededor de ${mainPeakFreq} Hz (${mainPeakNote}). La distribución por bandas se estima usando la energía del espectro calculado, no solo la cantidad de picos.`;
     }
 
     const orderedBands = [
@@ -121,37 +145,18 @@ export function buildInterpretationText(normalized, peaks) {
     const strongest = orderedBands[0];
     const second = orderedBands[1];
     const weakest = orderedBands[2];
-
     const spread = strongest.value - weakest.value;
-
-    const mainPeak = [...peaks].sort((a, b) => b.mag - a.mag)[0];
-    const mainPeakFreq = Math.round(mainPeak.freq);
-    const mainPeakNote = frequencyToNote(mainPeak.freq);
-
-    let mainPeakBand = "mid";
-    let mainPeakBandLabel = "medios";
-
-    if (mainPeak.freq < 250) {
-        mainPeakBand = "low";
-        mainPeakBandLabel = "graves";
-    } else if (mainPeak.freq < 2000) {
-        mainPeakBand = "mid";
-        mainPeakBandLabel = "medios";
-    } else {
-        mainPeakBand = "high";
-        mainPeakBandLabel = "agudos";
-    }
 
     let text = "";
 
     if (spread < 0.12) {
-        text += "El contenido del espectro está muy distribuido entre las diferentes bandas, sin una predominancia clara. ";
-        text += "Esto puede corresponder a una señal con características más homogéneas o sin componentes fuertemente dominantes. ";
+        text += "La energía espectral estimada está distribuida entre las diferentes bandas, sin una predominancia clara. ";
+        text += "Esto puede corresponder a una señal con características más homogéneas o sin una zona de frecuencia claramente dominante. ";
     } else {
         if (strongest.value >= 0.60) {
-            text += `Se observa un predominio claro de las frecuencias ${strongest.label}. `;
+            text += `Se observa un predominio claro de energía en las frecuencias ${strongest.label}. `;
         } else if (strongest.value >= 0.45) {
-            text += `Predominan las frecuencias ${strongest.label}, con cierta presencia de ${second.label}. `;
+            text += `Predominan las frecuencias ${strongest.label}, con presencia secundaria de ${second.label}. `;
         } else {
             text += "El contenido del sonido se encuentra relativamente distribuido entre varias bandas de frecuencia. ";
         }
@@ -165,18 +170,18 @@ export function buildInterpretationText(normalized, peaks) {
         }
 
         if (strongest.key === "low") {
-            text += "Esto suele asociarse con una sensación de profundidad o base rítmica en el sonido. ";
+            text += "Esto suele asociarse con una sensación de profundidad, peso o base rítmica en el sonido. ";
         } else if (strongest.key === "mid") {
-            text += "Esto indica una fuerte presencia en la zona donde suelen encontrarse muchos elementos melódicos. ";
+            text += "Esto indica una fuerte presencia en la zona donde suelen encontrarse muchos elementos melódicos y vocales. ";
         } else {
-            text += "Esto sugiere una presencia notable de brillo y detalle en el sonido. ";
+            text += "Esto sugiere una presencia notable de brillo, detalle o componentes de alta frecuencia. ";
         }
     }
 
     if (mainPeakBand !== strongest.key) {
-        text += `Aunque el pico más intenso aparece en la zona de ${mainPeakBandLabel}, no coincide con la banda predominante, lo que indica que una frecuencia puntual puede destacar sin representar toda la distribución del sonido. `;
+        text += `Aunque el pico más intenso aparece en la zona de ${mainPeakBandLabel}, no coincide con la banda de mayor energía estimada. Esto es importante: una frecuencia puntual puede destacar sin representar toda la distribución del sonido. `;
     } else {
-        text += `El pico principal también se encuentra en la zona de ${mainPeakBandLabel}, en coherencia con la distribución general. `;
+        text += `El pico principal también se encuentra en la zona de ${mainPeakBandLabel}, en coherencia con la banda de mayor energía estimada. `;
     }
 
     text += `El componente más destacado se encuentra alrededor de ${mainPeakFreq} Hz (${mainPeakNote}).`;
@@ -184,7 +189,7 @@ export function buildInterpretationText(normalized, peaks) {
     return text;
 }
 
-export function renderInterpretation(peaks, ui) {
+export function renderInterpretation(peaks, ui, bandDistribution = null) {
     const {
         bandLow,
         bandMid,
@@ -210,7 +215,7 @@ export function renderInterpretation(peaks, ui) {
         return;
     }
 
-    const bands = classifyFrequencyBands(peaks);
+    const bands = bandDistribution || classifyFrequencyBands(peaks);
     const normalized = normalizeBands(bands);
     const dominantBand = getDominantBandKey(normalized);
 

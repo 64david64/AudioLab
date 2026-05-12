@@ -191,14 +191,14 @@
     <h3>6. ¿Cómo se construye la interpretación automática?</h3>
 
     <p>
-        La interpretación automática del visor se basa en reglas simples y controladas. A partir de los picos detectados,
-        el sistema:
+        La interpretación automática del visor se basa en reglas simples y controladas. A partir del espectro visible,
+        la energía por bandas y los picos detectados, el sistema:
     </p>
 
     <div class="interp-pipeline">
         <div class="interp-pipeline-step">Detecta picos</div>
         <div class="interp-pipeline-arrow">→</div>
-        <div class="interp-pipeline-step">Clasifica por bandas</div>
+        <div class="interp-pipeline-step">Estima energía por bandas</div>
         <div class="interp-pipeline-arrow">→</div>
         <div class="interp-pipeline-step">Compara distribuciones</div>
         <div class="interp-pipeline-arrow">→</div>
@@ -220,7 +220,7 @@
             <h4>Lo que sí puede hacer</h4>
             <ul>
                 <li>Mostrar la estructura temporal y frecuencial de una ventana de audio.</li>
-                <li>Identificar picos relevantes y resumir su distribución por bandas.</li>
+                <li>Identificar picos relevantes y estimar energía relativa por bandas.</li>
                 <li>Proporcionar una lectura interpretativa básica y prudente.</li>
             </ul>
         </div>

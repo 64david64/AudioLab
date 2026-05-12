@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Óptica | AudioLab{% endblock %}
+
+{% block content %}
+<section class="section-card page-hero optics-hero">
+    <div class="page-hero-grid">
+        <div>
+            <span class="page-kicker">Módulo de óptica</span>
+            <h2>Reflexión, refracción y difracción</h2>
+            <p class="page-lead">
+                Explora tres fenómenos ondulatorios de la luz mediante explicaciones conceptuales y un simulador visual sencillo. El objetivo es conectar rayos, frentes de onda y cambios de dirección sin volver el modelo innecesariamente complejo.
+            </p>
+        </div>
+
+        <aside class="hero-support-card">
+            <h3>Idea central</h3>
+            <ul>
+                <li><strong>Reflexión:</strong> la luz rebota y conserva el ángulo respecto a la normal.</li>
+                <li><strong>Refracción:</strong> la luz cambia de dirección al pasar entre medios.</li>
+                <li><strong>Difracción:</strong> una abertura puede expandir los frentes de onda.</li>
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<section class="section-card optics-concept-section">
+    <div class="section-heading-row">
+        <div>
+            <span class="page-kicker">Marco conceptual</span>
+            <h3>Tres fenómenos principales</h3>
+        </div>
+        <p class="helper-text section-heading-note">
+            Las visualizaciones son modelos pedagógicos. No buscan sustituir una simulación óptica avanzada, sino hacer visible el comportamiento esencial.
+        </p>
+    </div>
+
+    <div class="optics-concept-grid">
+        <article class="optics-concept-card">
+            <span class="theory-number">01</span>
+            <h4>Reflexión</h4>
+            <p>
+                Cuando un rayo llega a una superficie reflectante, el ángulo de incidencia y el ángulo de reflexión se miden respecto a la normal y tienen el mismo valor.
+            </p>
+            <div class="formula-card compact-formula">$$ \theta_i = \theta_r $$</div>
+        </article>
+
+        <article class="optics-concept-card">
+            <span class="theory-number">02</span>
+            <h4>Refracción</h4>
+            <p>
+                Al cambiar de medio, la luz puede desviarse. La relación entre índices de refracción y ángulos se resume mediante la ley de Snell.
+            </p>
+            <div class="formula-card compact-formula">$$ n_1\sin(\theta_1)=n_2\sin(\theta_2) $$</div>
+        </article>
+
+        <article class="optics-concept-card">
+            <span class="theory-number">03</span>
+            <h4>Difracción</h4>
+            <p>
+                Cuando una onda pasa por una abertura comparable con su longitud de onda, tiende a expandirse. Aberturas más pequeñas generan mayor dispersión angular.
+            </p>
+            <div class="formula-card compact-formula">$$ I(\theta) \propto \left(\frac{\sin \beta}{\beta}\right)^2 $$</div>
+        </article>
+    </div>
+</section>
+
+<section class="section-card optics-lab-section">
+    <div class="section-heading-row lab-heading-row">
+        <div>
+            <span class="page-kicker">Simulador óptico</span>
+            <h3>Manipula el fenómeno y observa el cambio visual</h3>
+        </div>
+        <p class="helper-text section-heading-note">
+            Cambia el fenómeno y ajusta sus parámetros. La escena se actualiza en tiempo real para apoyar la interpretación conceptual.
+        </p>
+    </div>
+
+    <div class="optics-workspace">
+        <aside class="optics-control-panel">
+            <div class="control-group full-width-control">
+                <label for="optics-mode">Fenómeno</label>
+                <select id="optics-mode">
+                    <option value="reflection">Reflexión</option>
+                    <option value="refraction">Refracción</option>
+                    <option value="diffraction">Difracción</option>
+                </select>
+            </div>
+
+            <div class="preset-row optics-preset-row">
+                <button type="button" class="preset-chip" data-optics-preset="mirror">Espejo plano</button>
+                <button type="button" class="preset-chip" data-optics-preset="air-glass">Aire → vidrio</button>
+                <button type="button" class="preset-chip" data-optics-preset="glass-air">Vidrio → aire</button>
+                <button type="button" class="preset-chip" data-optics-preset="narrow-slit">Abertura estrecha</button>
+            </div>
+
+            <div class="slider-control-block">
+                <div class="slider-label-row">
+                    <label for="optics-angle">Ángulo incidente</label>
+                    <strong id="optics-angle-output">35°</strong>
+                </div>
+                <input type="range" id="optics-angle" min="0" max="80" step="1" value="35">
+            </div>
+
+            <div class="optics-control-grid">
+                <div class="control-group">
+                    <label for="optics-n1">Índice n₁</label>
+                    <input type="number" id="optics-n1" min="1" max="2.5" step="0.01" value="1.00">
+                </div>
+                <div class="control-group">
+                    <label for="optics-n2">Índice n₂</label>
+                    <input type="number" id="optics-n2" min="1" max="2.5" step="0.01" value="1.50">
+                </div>
+            </div>
+
+            <div class="slider-control-block">
+                <div class="slider-label-row">
+                    <label for="optics-wavelength">Longitud de onda visual</label>
+                    <strong id="optics-wavelength-output">520 nm</strong>
+                </div>
+                <input type="range" id="optics-wavelength" min="380" max="700" step="5" value="520">
+                <div class="range-hints"><span>violeta</span><span>rojo</span></div>
+            </div>
+
+            <div class="slider-control-block">
+                <div class="slider-label-row">
+                    <label for="optics-slit">Abertura</label>
+                    <strong id="optics-slit-output">1.20 λ</strong>
+                </div>
+                <input type="range" id="optics-slit" min="0.5" max="5" step="0.05" value="1.2">
+                <div class="range-hints"><span>estrecha</span><span>amplia</span></div>
+            </div>
+
+            <div id="optics-status" class="analysis-quality-message info">
+                Selecciona un fenómeno y ajusta los controles.
+            </div>
+        </aside>
+
+        <div class="optics-visual-panel">
+            <article class="optics-canvas-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Escena</span>
+                        <h4 id="optics-scene-title">Reflexión en superficie plana</h4>
+                    </div>
+                    <span class="simulation-status-chip">Modelo conceptual</span>
+                </div>
+                <canvas id="optics-canvas" class="plot-canvas optics-canvas"></canvas>
+            </article>
+
+            <div class="synthesis-interpretation-grid optics-reading-grid">
+                <article class="reading-guide-card synthesis-reading-card">
+                    <span>Observación técnica</span>
+                    <p id="optics-technical-output">La reflexión mantiene iguales el ángulo de incidencia y el de reflexión.</p>
+                </article>
+
+                <article class="reading-guide-card synthesis-reading-card">
+                    <span>Lectura visual</span>
+                    <p id="optics-visual-output">El rayo rebota de forma simétrica respecto a la normal.</p>
+                </article>
+
+                <article class="reading-guide-card synthesis-reading-card caution">
+                    <span>Precaución</span>
+                    <p id="optics-caution-output">La escena usa rayos y frentes de onda simplificados para facilitar la comprensión.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

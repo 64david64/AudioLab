@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Simulación acústica | AudioLab{% endblock %}
+
+{% block content %}
+<section class="section-card page-hero simulation-hero">
+    <div class="page-hero-grid">
+        <div>
+            <span class="page-kicker">Simulación acústica</span>
+            <h2>Efecto Doppler, distancia e intensidad sonora</h2>
+            <p class="page-lead">
+                Experimenta cómo el movimiento de una fuente sonora modifica la frecuencia percibida, cómo la distancia cambia la intensidad y cómo esos cambios se pueden escuchar con un tono sintético o con el audio cargado en Análisis.
+            </p>
+        </div>
+
+        <aside class="hero-support-card simulation-support-card">
+            <h3>Cómo leer esta ventana</h3>
+            <ul>
+                <li><strong>Escena:</strong> observa fuente, observador y ondas.</li>
+                <li><strong>Lecturas:</strong> revisa frecuencia, distancia e intensidad.</li>
+                <li><strong>Controles:</strong> modifica movimiento, audio y tono.</li>
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<section class="section-card simulation-foundation-section">
+    <div class="section-heading-row">
+        <div>
+            <span class="page-kicker">Fundamento del modelo</span>
+            <h3>Antes de simular: tres ideas clave</h3>
+        </div>
+        <p class="helper-text section-heading-note">
+            Estas fórmulas se usan como apoyo pedagógico. La simulación busca mostrar tendencias físicas, no reemplazar una medición acústica real.
+        </p>
+    </div>
+
+    <div class="simulation-foundation-grid">
+        <article class="simulation-theory-card">
+            <span class="theory-number">01</span>
+            <h4>Efecto Doppler</h4>
+            <p>
+                Si la fuente se acerca, la frecuencia percibida aumenta. Si se aleja, la frecuencia percibida disminuye.
+            </p>
+            <div class="formula-card compact-formula">
+                $$ f' = \frac{f \cdot v}{v - v_s} $$
+            </div>
+        </article>
+
+        <article class="simulation-theory-card">
+            <span class="theory-number">02</span>
+            <h4>Intensidad relativa</h4>
+            <p>
+                La intensidad disminuye al aumentar la distancia. La lámpara visualiza esta tendencia con cambios de brillo.
+            </p>
+            <div class="formula-card compact-formula">
+                $$ I \propto \frac{1}{r^2} $$
+            </div>
+        </article>
+
+        <article class="simulation-theory-card">
+            <span class="theory-number">03</span>
+            <h4>Nivel en decibeles</h4>
+            <p>
+                Los decibeles usan una escala logarítmica para representar cambios de intensidad de forma más cercana a la percepción.
+            </p>
+            <div class="formula-card compact-formula">
+                $$ L = 10 \log_{10}\left(\frac{I}{I_0}\right) $$
+            </div>
+        </article>
+    </div>
+
+    <div class="simulation-relation-strip" aria-label="Relación entre fenómenos físicos y percepción">
+        <div class="relation-pill">Movimiento</div>
+        <div class="relation-arrow">→</div>
+        <div class="relation-pill">Ondas comprimidas o expandidas</div>
+        <div class="relation-arrow">→</div>
+        <div class="relation-pill">Frecuencia percibida</div>
+        <div class="relation-arrow">→</div>
+        <div class="relation-pill">Altura tonal</div>
+    </div>
+</section>
+
+<section class="section-card simulation-lab-section">
+    <div class="section-heading-row lab-heading-row">
+        <div>
+            <span class="page-kicker">Laboratorio interactivo</span>
+            <h3>Simula, escucha e interpreta el fenómeno</h3>
+        </div>
+        <p class="helper-text section-heading-note">
+            La escena principal está separada de los controles para evitar saturación visual. Primero observa el fenómeno; luego ajusta la fuente sonora y los parámetros físicos.
+        </p>
+    </div>
+
+    <div class="simulation-workspace">
+        <div class="simulation-main-grid">
+            <article class="simulation-stage-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Escena principal</span>
+                        <h4>Fuente móvil y observador fijo</h4>
+                    </div>
+                    <span class="simulation-status-chip">Visualización espacial</span>
+                </div>
+
+                <p class="helper-text simulation-card-note">
+                    Observa cómo cada frente de onda nace desde la posición que tenía la fuente al emitirlo. Esa separación permite ver por qué la frecuencia percibida cambia cuando hay movimiento.
+                </p>
+
+                <div class="simulation-canvas-frame">
+                    <canvas id="doppler-canvas" class="doppler-canvas"></canvas>
+                </div>
+
+                <div id="doppler-live-caption" class="doppler-live-caption" aria-live="polite">
+                    La escena mostrará frentes de onda independientes emitidos desde la fuente en movimiento.
+                </div>
+            </article>
+
+            <aside class="simulation-monitor-panel">
+                <article class="simulation-monitor-card readings-card">
+                    <div class="simulation-card-header compact-header">
+                        <div>
+                            <span class="simulation-step-label">Lectura</span>
+                            <h4>Valores en tiempo real</h4>
+                        </div>
+                    </div>
+
+                    <div class="sim-results-compact">
+                        <div class="doppler-result-item">
+                            <span>Frecuencia emitida</span>
+                            <strong id="doppler-emitted-frequency">440 Hz</strong>
+                        </div>
+
+                        <div class="doppler-result-item">
+                            <span>Frecuencia percibida</span>
+                            <strong id="doppler-perceived-frequency">—</strong>
+                        </div>
+
+                        <div class="doppler-result-item">
+                            <span>Distancia</span>
+                            <strong id="doppler-distance">—</strong>
+                        </div>
+
+                        <div class="doppler-result-item">
+                            <span>Intensidad relativa</span>
+                            <strong id="doppler-intensity">—</strong>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="simulation-monitor-card lamp-card compact-lamp-card">
+                    <div class="simulation-card-header compact-header">
+                        <div>
+                            <span class="simulation-step-label">Intensidad</span>
+                            <h4>Lámpara visual</h4>
+                        </div>
+                    </div>
+                    <p class="helper-text">
+                        Más brillo representa mayor intensidad relativa percibida por el observador.
+                    </p>
+                    <div id="intensity-lamp" class="intensity-lamp" style="--lamp-level: 0.35;">
+                        <div class="lamp-glow"></div>
+                        <div class="lamp-bulb"></div>
+                        <div class="lamp-base"></div>
+                    </div>
+                    <strong id="lamp-intensity-label">Intensidad relativa: —</strong>
+                </article>
+
+                <article class="simulation-monitor-card spectrum-card compact-spectrum-card">
+                    <div class="simulation-card-header compact-header">
+                        <div>
+                            <span class="simulation-step-label">Frecuencia</span>
+                            <h4>Espectro conceptual</h4>
+                        </div>
+                    </div>
+                    <p class="helper-text">
+                        Compara el pico emitido con el pico percibido. La flecha muestra hacia dónde se desplaza el espectro conceptual.
+                    </p>
+                    <canvas id="doppler-spectrum-canvas" class="doppler-spectrum-canvas"></canvas>
+                </article>
+            </aside>
+        </div>
+
+        <div class="simulation-controls-zone">
+            <article class="simulation-control-card simulation-presets-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Presets</span>
+                        <h4>Escenarios rápidos</h4>
+                    </div>
+                </div>
+                <p class="helper-text">
+                    Usa estos escenarios para comparar de forma rápida cómo cambian el movimiento, la frecuencia percibida y la intensidad.
+                </p>
+                <div class="preset-row">
+                    <button type="button" class="preset-chip" data-doppler-preset="approach">Fuente acercándose</button>
+                    <button type="button" class="preset-chip" data-doppler-preset="away">Fuente alejándose</button>
+                    <button type="button" class="preset-chip" data-doppler-preset="still">Fuente quieta</button>
+                    <button type="button" class="preset-chip" data-doppler-preset="fast">Movimiento rápido</button>
+                </div>
+            </article>
+
+            <article class="simulation-control-card source-control-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Fuente</span>
+                        <h4>Origen del sonido</h4>
+                    </div>
+                </div>
+
+                <div class="source-mode-grid" role="radiogroup" aria-label="Fuente sonora de la simulación">
+                    <label class="source-mode-option">
+                        <input type="radio" name="source-mode" id="source-mode-tone" value="tone" checked>
+                        <span>
+                            <strong>Tono sintético</strong>
+                            <small>Ideal para escuchar una frecuencia pura.</small>
+                        </span>
+                    </label>
+
+                    <label class="source-mode-option">
+                        <input type="radio" name="source-mode" id="source-mode-uploaded" value="uploaded">
+                        <span>
+                            <strong>Audio cargado en Análisis</strong>
+                            <small>Usa el último archivo compartido desde la pestaña Análisis.</small>
+                        </span>
+                    </label>
+                </div>
+
+                <div id="stored-audio-status" class="analysis-quality-message info compact-status">
+                    Buscando audio cargado desde Análisis...
+                </div>
+
+                <div class="doppler-buttons compact-buttons">
+                    <button id="refresh-stored-audio-btn" class="secondary-btn" type="button">
+                        Actualizar audio
+                    </button>
+                    <button id="clear-stored-audio-btn" class="secondary-btn" type="button">
+                        Limpiar audio
+                    </button>
+                </div>
+            </article>
+
+            <article class="simulation-control-card physics-control-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Movimiento</span>
+                        <h4>Controles físicos</h4>
+                    </div>
+                </div>
+
+                <div class="doppler-controls-grid stacked-controls-grid">
+                    <div class="control-group">
+                        <label for="source-frequency">Frecuencia emitida / referencia (Hz)</label>
+                        <input type="number" id="source-frequency" min="20" max="20000" step="10" value="440">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="source-speed">Velocidad de la fuente (m/s)</label>
+                        <input type="number" id="source-speed" min="-120" max="120" step="1" value="30">
+                    </div>
+                </div>
+
+                <p class="helper-text control-note">
+                    Velocidad positiva: movimiento hacia la derecha. Velocidad negativa: movimiento hacia la izquierda.
+                </p>
+
+                <div class="doppler-buttons control-actions-row">
+                    <button id="toggle-doppler-btn" class="primary-btn" type="button">
+                        Iniciar simulación
+                    </button>
+
+                    <button id="reset-doppler-btn" class="secondary-btn" type="button">
+                        Reiniciar
+                    </button>
+                </div>
+            </article>
+
+            <article class="simulation-control-card audio-control-card">
+                <div class="simulation-card-header">
+                    <div>
+                        <span class="simulation-step-label">Audio</span>
+                        <h4>Respuesta auditiva</h4>
+                    </div>
+                </div>
+
+                <div class="control-group range-control-group">
+                    <label for="source-intensity">Intensidad manual</label>
+                    <input type="range" id="source-intensity" min="0" max="100" step="1" value="70">
+                    <span id="source-intensity-value" class="range-value">70%</span>
+                </div>
+
+                <div class="control-group range-control-group">
+                    <label for="source-pitch">Tono / frecuencia percibida manual</label>
+                    <input type="range" id="source-pitch" min="0.5" max="1.5" step="0.01" value="1">
+                    <span id="source-pitch-value" class="range-value">1.00×</span>
+                </div>
+
+                <div class="audio-link-options">
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="auto-doppler-audio" checked>
+                        <span>Conectar tono escuchado con Doppler</span>
+                    </label>
+
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="auto-distance-gain" checked>
+                        <span>Conectar volumen con distancia</span>
+                    </label>
+                </div>
+
+                <div class="doppler-buttons control-actions-row">
+                    <button id="toggle-doppler-audio-btn" class="primary-btn" type="button">
+                        Reproducir fuente
+                    </button>
+                </div>
+
+                <div id="doppler-audio-status" class="analysis-quality-message info compact-status">
+                    El sonido está detenido.
+                </div>
+
+                <p class="helper-text control-note">
+                    En audio cargado, el tono modifica la velocidad de reproducción. Es una aproximación pedagógica al cambio de frecuencia percibida.
+                </p>
+            </article>
+        </div>
+
+        <article class="simulation-interpretation-card">
+            <div class="simulation-card-header compact-header">
+                <div>
+                    <span class="simulation-step-label">Interpretación</span>
+                    <h4>Lectura automática del fenómeno</h4>
+                </div>
+            </div>
+
+            <div id="doppler-interpretation" class="doppler-interpretation">
+                Aún no hay interpretación disponible.
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}

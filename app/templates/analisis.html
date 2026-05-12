@@ -3,19 +3,33 @@
 {% block title %}Análisis | AudioLab{% endblock %}
 
 {% block content %}
-<div class="section-card">
-    <h2>Zona de análisis</h2>
-    <p>
-        En esta sección podrás cargar un archivo de audio local y preparar
-        su visualización en el dominio del tiempo y en el dominio de la frecuencia.
-    </p>
-</div>
+<section class="section-card page-hero analysis-hero-compact">
+    <div class="page-hero-grid">
+        <div>
+            <span class="page-kicker">Módulo de análisis</span>
+            <h2>Laboratorio visual de una señal de audio</h2>
+            <p class="page-lead">
+                Carga un archivo local y analiza su comportamiento desde tres lecturas complementarias: forma de onda, espectro del fragmento y espectrograma tiempo-frecuencia.
+            </p>
+        </div>
 
-<div class="section-grid analysis-top-grid">
-    <div class="section-card upload-box">
+        <aside class="hero-support-card">
+            <h3>Lectura central</h3>
+            <ul>
+                <li><strong>Tiempo:</strong> amplitud de la señal en la ventana visible.</li>
+                <li><strong>Frecuencia:</strong> componentes dominantes del fragmento seleccionado.</li>
+                <li><strong>Tiempo-frecuencia:</strong> evolución espectral dentro de la misma ventana.</li>
+            </ul>
+        </aside>
+    </div>
+</section>
+
+<div class="section-grid analysis-top-grid analysis-load-grid">
+    <div class="section-card upload-box analysis-upload-card">
         <h3>Cargar archivo de audio</h3>
         <p class="helper-text">
-            Formatos permitidos en esta etapa: .wav, .mp3 y .ogg
+            Formatos permitidos: .wav, .mp3 y .ogg. El procesamiento ocurre localmente en el navegador.
+            El último audio cargado queda disponible temporalmente como fuente sonora en la simulación Doppler.
         </p>
 
         <input type="file" id="audio-file" accept=".wav,.mp3,.ogg">
@@ -24,15 +38,20 @@
             Aún no se ha cargado ningún archivo.
         </p>
 
-        <button type="button" class="primary-btn" id="process-audio-btn">
-            Procesar audio
-        </button>
+        <div class="button-row analysis-upload-actions">
+            <button type="button" class="primary-btn" id="process-audio-btn">
+                Procesar audio
+            </button>
+            <button type="button" class="secondary-btn" id="load-shared-audio-btn">
+                Cargar audio compartido
+            </button>
+        </div>
     </div>
 
-    <div class="section-card metadata-box">
+    <div class="section-card metadata-box analysis-metadata-card">
         <h3>Información del archivo</h3>
 
-        <div class="metadata-list">
+        <div class="metadata-list compact-metadata-list">
             <div class="metadata-item">
                 <span class="metadata-label">Nombre:</span>
                 <span id="meta-name">—</span>
@@ -56,106 +75,232 @@
     </div>
 </div>
 
-<div class="plots-stack">
-    <div class="section-card plot-box">
-        <h3>Forma de onda</h3>
-        <p class="helper-text">
-            Aquí se mostrará la señal en el dominio del tiempo.
-        </p>
-
-        <div class="wave-controls">
-            <div class="control-group">
-                <label for="view-start">Inicio de vista (s)</label>
-                <input type="number" id="view-start" min="0" step="0.01" value="0">
-            </div>
-
-            <div class="control-group">
-                <label for="view-window">Duración visible (s)</label>
-                <input type="number" id="view-window" min="0.1" step="0.01" value="10">
-            </div>
-
-            <div class="control-group control-button-group">
-                <button type="button" class="primary-btn" id="update-view-btn">
-                    Actualizar vista
-                </button>
-            </div>
+<section class="analysis-sticky-timeline" aria-label="Control fijo de ventana temporal">
+    <div class="timeline-main-row">
+        <div class="timeline-title-block">
+            <span class="timeline-kicker">Ventana temporal analizada</span>
+            <strong>Mueve el control y observa cómo cambian las tres gráficas.</strong>
         </div>
 
-        <canvas id="waveform-canvas" class="plot-canvas"></canvas>
+        <div class="timeline-summary-grid">
+            <div class="timeline-summary-item">
+                <span>Inicio</span>
+                <strong id="temporal-window-start">—</strong>
+            </div>
+            <div class="timeline-summary-item">
+                <span>Fin</span>
+                <strong id="temporal-window-end">—</strong>
+            </div>
+            <div class="timeline-summary-item">
+                <span>Duración</span>
+                <strong id="temporal-window-duration">—</strong>
+            </div>
+            <div class="timeline-summary-item">
+                <span>Muestras</span>
+                <strong id="temporal-window-samples">—</strong>
+            </div>
+        </div>
+    </div>
 
-        <div class="slider-block">
+    <div class="analysis-preset-strip" aria-label="Presets rápidos de análisis">
+        <span>Presets:</span>
+        <button type="button" class="preset-chip" data-analysis-preset="voice">Voz</button>
+        <button type="button" class="preset-chip" data-analysis-preset="music">Música</button>
+        <button type="button" class="preset-chip" data-analysis-preset="transient">Golpes / transientes</button>
+    </div>
+
+    <div class="timeline-control-row">
+        <div class="control-group compact-control-group">
+            <label for="view-start">Inicio de vista (s)</label>
+            <input type="number" id="view-start" min="0" step="0.01" value="0">
+        </div>
+
+        <div class="control-group compact-control-group">
+            <label for="view-window">Duración visible (s)</label>
+            <input type="number" id="view-window" min="0.1" step="0.01" value="10">
+        </div>
+
+        <div class="timeline-slider-block">
             <label for="view-slider">Navegación temporal</label>
             <input type="range" id="view-slider" min="0" max="100" step="0.01" value="0">
         </div>
+
+        <div class="control-group control-button-group timeline-button-group">
+            <button type="button" class="primary-btn" id="update-view-btn">
+                Actualizar ventana
+            </button>
+        </div>
+    </div>
+</section>
+
+<section class="analysis-visual-lab">
+    <div class="analysis-lab-heading">
+        <span class="page-kicker">Laboratorio visual</span>
+        <h3>Tres formas de leer el mismo fragmento</h3>
+        <p>
+            La barra temporal permanece visible para que puedas mover la ventana y comparar directamente cómo responden la forma de onda, el espectro y el espectrograma.
+        </p>
     </div>
 
-    <div class="section-card analysis-main-card">
-        <h3>Transformada discreta de Fourier (DFT)</h3>
+    <div class="section-card plot-box analysis-visual-card waveform-feature-card">
+        <div class="analysis-card-heading-row">
+            <div>
+                <span class="analysis-step-badge">01 · Tiempo</span>
+                <h3>Forma de onda</h3>
+                <p class="helper-text">
+                    Representa la amplitud del audio dentro de la ventana temporal seleccionada.
+                </p>
+            </div>
+        </div>
+
+        <div class="reading-guide-grid compact-guide">
+            <div class="reading-guide-card">
+                <span>Qué estás viendo</span>
+                <p>La amplitud de la señal en la ventana temporal seleccionada.</p>
+            </div>
+            <div class="reading-guide-card">
+                <span>Qué debes observar</span>
+                <p>Cambios bruscos, zonas densas, silencios y variaciones de intensidad local.</p>
+            </div>
+            <div class="reading-guide-card caution">
+                <span>Limitación</span>
+                <p>La amplitud se autoescala para facilitar la lectura visual de cada ventana.</p>
+            </div>
+        </div>
+
+        <canvas id="waveform-canvas" class="plot-canvas waveform-canvas-feature"></canvas>
+    </div>
+
+    <div class="section-card analysis-main-card spectrum-feature-card">
+        <div class="analysis-card-heading-row">
+            <div>
+                <span class="analysis-step-badge">02 · Frecuencia</span>
+                <h3>Espectro del fragmento seleccionado</h3>
+                <p class="helper-text">
+                    La DFT se calcula manualmente sobre un fragmento central de la ventana visible. Esto mantiene el enfoque didáctico sin ocultar el proceso detrás de una FFT optimizada.
+                </p>
+            </div>
+
+            <div class="wave-controls fft-controls analysis-card-controls">
+                <div class="control-group">
+                    <label for="fft-max-frequency">Frecuencia máxima visible (Hz)</label>
+                    <input type="number" id="fft-max-frequency" min="100" step="100" value="5000">
+                </div>
+
+                <div class="control-group control-button-group">
+                    <button type="button" class="primary-btn" id="update-fft-btn">
+                        Actualizar DFT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-method-note">
+            <strong>Nota metodológica:</strong> los picos dominantes señalan frecuencias puntuales destacadas; las tarjetas de graves, medios y agudos resumen energía espectral estimada por banda.
+        </div>
+
+        <div id="analysis-quality-output" class="analysis-quality-message info">
+            Carga y procesa un archivo para evaluar la calidad del fragmento analizado.
+        </div>
+
+        <canvas id="fft-canvas" class="plot-canvas fft-canvas-large fft-canvas-feature"></canvas>
+    </div>
+
+    <div class="section-card spectrogram-card spectrogram-feature-card">
+        <div class="spectrogram-header-row analysis-card-heading-row">
+            <div>
+                <span class="analysis-step-badge">03 · Tiempo-frecuencia</span>
+                <h3>Espectrograma</h3>
+                <p class="helper-text">
+                    Muestra cómo cambia el contenido frecuencial dentro de la ventana visible. Los colores representan intensidad relativa: no son luz real, sino un código visual para facilitar la interpretación.
+                </p>
+            </div>
+
+            <div class="spectrogram-controls analysis-card-controls">
+                <div class="control-group">
+                    <label for="spectrogram-window-size">Tamaño de ventana</label>
+                    <select id="spectrogram-window-size">
+                        <option value="256">Corta: 256 muestras</option>
+                        <option value="512" selected>Media: 512 muestras</option>
+                        <option value="1024">Larga: 1024 muestras</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="spectrogram-guide-row">
+            <div class="reading-guide-card">
+                <span>Lectura horizontal</span>
+                <p>El tiempo avanza de izquierda a derecha.</p>
+            </div>
+            <div class="reading-guide-card">
+                <span>Lectura vertical</span>
+                <p>La frecuencia aumenta de abajo hacia arriba.</p>
+            </div>
+            <div class="reading-guide-card">
+                <span>Brillo / color</span>
+                <p>Indica mayor energía relativa en esa frecuencia y momento.</p>
+            </div>
+            <div class="reading-guide-card caution">
+                <span>Precaución</span>
+                <p>Ventanas cortas mejoran detalle temporal; ventanas largas mejoran detalle frecuencial.</p>
+            </div>
+        </div>
+
+        <div id="spectrogram-status-output" class="analysis-quality-message info">
+            Carga y procesa un archivo para calcular el espectrograma de la ventana visible.
+        </div>
+
+        <canvas id="spectrogram-canvas" class="plot-canvas spectrogram-canvas spectrogram-canvas-feature"></canvas>
+    </div>
+</section>
+
+<section class="analysis-results-zone">
+    <div class="section-card interpretation-card interpretation-wide-card analysis-interpretation-card">
+        <h3>Interpretación automática básica</h3>
         <p class="helper-text">
-            Aquí se mostrará la distribución del contenido en frecuencia de la ventana temporal seleccionada.
+            Esta lectura conecta la energía por bandas con los picos detectados. Es una guía pedagógica, no una identificación automática de instrumentos.
         </p>
 
-        <div class="analysis-top-row">
-            <div class="analysis-fft-panel">
-                <div class="wave-controls fft-controls">
-                    <div class="control-group">
-                        <label for="fft-max-frequency">Frecuencia máxima visible (Hz)</label>
-                        <input type="number" id="fft-max-frequency" min="100" step="100" value="5000">
-                    </div>
+        <div id="interpretation-output" class="interpretation-text">
+            Aún no hay interpretación disponible.
+        </div>
+    </div>
 
-                    <div class="control-group control-button-group">
-                        <button type="button" class="primary-btn" id="update-fft-btn">
-                            Actualizar DFT
-                        </button>
-                    </div>
-                </div>
-
-                <canvas id="fft-canvas" class="plot-canvas fft-canvas-large"></canvas>
+    <div class="analysis-complement-grid">
+        <div class="dominant-peaks-card side-card section-card">
+            <h4>Frecuencias dominantes detectadas</h4>
+            <p class="helper-text">
+                Se muestran los picos principales dentro del rango de frecuencias visible. El pico principal es el de mayor magnitud.
+            </p>
+            <div id="dominant-peaks-output" class="dominant-peaks-output">
+                Aún no hay datos disponibles.
             </div>
-
-            <aside class="analysis-peaks-panel">
-                <div class="dominant-peaks-card side-card">
-                    <h4>Frecuencias dominantes detectadas</h4>
-                    <p class="helper-text">
-                        Se muestran los picos principales dentro del rango de frecuencias visible.
-                    </p>
-                    <div id="dominant-peaks-output" class="dominant-peaks-output">
-                        Aún no hay datos disponibles.
-                    </div>
-                </div>
-            </aside>
         </div>
 
-        <div class="analysis-bottom-row">
-            <div class="interpretation-card interpretation-wide-card">
-                <h4>Interpretación automática básica</h4>
-                <p class="helper-text">
-                    Esta primera interpretación resume cómo se distribuyen los picos detectados
-                    entre graves, medios y agudos.
-                </p>
+        <div class="interpretation-card section-card band-panel-card">
+            <h4>Energía estimada por bandas</h4>
+            <p class="helper-text">
+                Resumen relativo del contenido espectral en bajas, medias y altas frecuencias.
+            </p>
 
-                <div class="band-summary band-summary-horizontal">
-                    <div class="band-item" id="band-card-low">
-                        <span class="band-label">Graves</span>
-                        <span id="band-low" class="band-value">—</span>
-                    </div>
-
-                    <div class="band-item" id="band-card-mid">
-                        <span class="band-label">Medios</span>
-                        <span id="band-mid" class="band-value">—</span>
-                    </div>
-
-                    <div class="band-item" id="band-card-high">
-                        <span class="band-label">Agudos</span>
-                        <span id="band-high" class="band-value">—</span>
-                    </div>
+            <div class="band-summary band-summary-horizontal">
+                <div class="band-item" id="band-card-low">
+                    <span class="band-label">Graves</span>
+                    <span id="band-low" class="band-value">—</span>
                 </div>
 
-                <div id="interpretation-output" class="interpretation-text">
-                    Aún no hay interpretación disponible.
+                <div class="band-item" id="band-card-mid">
+                    <span class="band-label">Medios</span>
+                    <span id="band-mid" class="band-value">—</span>
+                </div>
+
+                <div class="band-item" id="band-card-high">
+                    <span class="band-label">Agudos</span>
+                    <span id="band-high" class="band-value">—</span>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
